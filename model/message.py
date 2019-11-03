@@ -4,9 +4,10 @@ from __future__ import annotations
 
 
 class Message:
-    def __init__(self, timestamp: str, content: str):
-        self.timestamp = timestamp
+    def __init__(self, idx: int, content: str, timestamp: str):
+        self.index = idx
         self.content = content
+        self.timestamp = timestamp
 
 
 if __name__ == '__main__':
