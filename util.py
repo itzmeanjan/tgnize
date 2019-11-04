@@ -14,6 +14,13 @@ except ImportError as e:
     print('[!]Module Unavailable : {}'.format(str(e)))
     exit(1)
 
+'''
+    Pushes extracted message by a certain user
+    into his/ her own record holder object.
+
+    Along with so, updates main chat holder object
+'''
+
 
 def keepTrackOfMessages(user: str, message: Message, chat: Chat):
     check = chat.getUser(user)
@@ -22,6 +29,12 @@ def keepTrackOfMessages(user: str, message: Message, chat: Chat):
         chat.pushUser(check)
     else:
         check.messages.append(message)
+
+
+'''
+    Extracts message content from Div element
+    of parsed html tree
+'''
 
 
 def parseAMessage(tag: Tag, idx: int) -> Tuple[str, Message]:
@@ -34,6 +47,14 @@ def parseAMessage(tag: Tag, idx: int) -> Tuple[str, Message]:
             'title'))
 
 
+'''
+    Parses html content of a file, builds
+    Element Tree, processes each message present
+    with in that html file ( which is nothing but
+    one of those exported chat files, present under ./data )
+'''
+
+
 def parseChatFile(content: str, idx: int, chat: Chat) -> int:
     tree = BeautifulSoup(content, features='lxml')
     for i, j in enumerate(tree.findAll('div',
@@ -42,15 +63,36 @@ def parseChatFile(content: str, idx: int, chat: Chat) -> int:
     return idx + i + 1
 
 
+'''
+    Reads whole content ( html file content)
+    of requested filepath & return so
+'''
+
+
 def getFileContent(targetPath: str) -> str:
     with open(targetPath, mode='r') as fd:
         return fd.read()
+
+
+'''
+    Returns a collection of file paths
+    which are holding exported telegram chat 
+    ( i.e. group or private ), *.html files,
+    present under ./data
+'''
 
 
 def getChatFiles(targetPath: str = './data') -> List[str]:
     return [join(abspath(targetPath), i)
             for i in listdir(targetPath)
             if i.startswith('messages') and i.endswith('html')]
+
+
+'''
+    Parses all exported telegram chat
+    files ( html files ) and builds chat object,
+    holding organized information regarding whole chat ( private/ group )
+'''
 
 
 def parseChat(targetPath: str = './data') -> Chat:

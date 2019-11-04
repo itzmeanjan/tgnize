@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+'''
+    Main entry point of script
+'''
+
 
 def main():
     pass
