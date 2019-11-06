@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 from typing import List
-from event import Event
 from activity import Activity
-from message import Message
 
 
 class Chat:

@@ -4,9 +4,8 @@ from __future__ import annotations
 from os import listdir
 from os.path import join, abspath
 from typing import List, Tuple
-from model.message import Message
 from model.chat import Chat
-from model.user import User
+from model.message import Message
 from model.event import Event
 from re import compile as reg_compile
 try:
@@ -25,8 +24,8 @@ def handleEvent(tag: Tag, chat: Chat, div_class: List[str] = ['message', 'servic
 
 
 def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None, div_class: List[str] = ['message', 'default', 'clearfix']):
-    txt = tag.find('div', attrs={'class': 'text'})
     if not prev_tag:
+        txt = tag.find('div', attrs={'class': 'text'})
         chat.activities.append(
             Message(
                 int(tag.get('id').replace('message', ''), base=10),
@@ -38,6 +37,7 @@ def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None, div_class: List[st
             )
         )
     else:
+        txt = prev_tag.find('div', attrs={'class': 'text'})
         chat.activities.append(
             Message(
                 int(tag.get('id').replace('message', ''), base=10),
