@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from datetime import datetime
+from activity import Activity
 
 '''
     This class is designed to hold 
@@ -16,9 +17,10 @@ from datetime import datetime
 '''
 
 
-class Message:
-    def __init__(self, idx: int, content: str, timestamp: str):
-        self.index = idx
+class Message(Activity):
+    def __init__(self, idx: int, user: str, content: str, timestamp: str):
+        super().__init__(idx)
+        self.user = user
         self.content = content
         self.timestamp = timestamp
 

@@ -7,6 +7,8 @@ from typing import List, Tuple
 from model.message import Message
 from model.chat import Chat
 from model.user import User
+from model.event import Event
+from re import compile as reg_compile
 try:
     from bs4 import BeautifulSoup
     from bs4.element import Tag
@@ -14,53 +16,77 @@ except ImportError as e:
     print('[!]Module Unavailable : {}'.format(str(e)))
     exit(1)
 
-'''
-    Pushes extracted message by a certain user
-    into his/ her own record holder object.
 
-    Along with so, updates main chat holder object
-'''
-
-
-def keepTrackOfMessages(user: str, message: Message, chat: Chat):
-    check = chat.getUser(user)
-    if not check:
-        check = User(user, [message])
-        chat.pushUser(check)
-    else:
-        check.messages.append(message)
+def handleEvent(tag: Tag, chat: Chat, div_class: List[str] = ['message', 'service']):
+    chat.activities.append(
+        Event(int(tag.get('id').replace('message', ''), base=10),
+              tag.find('div', attrs={'class': 'body details'}).getText().strip())
+    )
 
 
-'''
-    Extracts message content from Div element
-    of parsed html tree
-'''
-
-
-def parseAMessage(tag: Tag, idx: int) -> Tuple[str, Message]:
+def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None, div_class: List[str] = ['message', 'default', 'clearfix']):
     txt = tag.find('div', attrs={'class': 'text'})
-    return tag.find('div', attrs={'class': 'from_name'}).getText().strip(), \
-        Message(
-        idx,
-        txt.getText().strip() if txt else None,
-        tag.find('div', attrs={'class': 'pull_right date details'}).get(
-            'title'))
+    if not prev_tag:
+        chat.activities.append(
+            Message(
+                int(tag.get('id').replace('message', ''), base=10),
+                tag.find('div', attrs={
+                         'class': 'from_name'}).getText().strip(),
+                txt.getText().strip() if txt else None,
+                tag.find('div', attrs={'class': 'pull_right date details'}).get(
+                    'title')
+            )
+        )
+    else:
+        chat.activities.append(
+            Message(
+                int(tag.get('id').replace('message', ''), base=10),
+                prev_tag.find('div', attrs={
+                    'class': 'from_name'}).getText().strip(),
+                txt.getText().strip() if txt else None,
+                tag.find('div', attrs={'class': 'pull_right date details'}).get(
+                    'title')
+            )
+        )
+
+
+def routeToProperHandler(tag: Tag, prev_tag: Tag, chat: Chat):
+    if tag.get('class') == ['message', 'service']:
+        handleEvent(tag, chat)
+    elif tag.get('class') == ['message', 'default', 'clearfix']:
+        handleMessage(tag, chat)
+    else:
+        handleMessage(tag, chat, prev_tag=prev_tag)
 
 
 '''
-    Parses html content of a file, builds
-    Element Tree, processes each message present
-    with in that html file ( which is nothing but
-    one of those exported chat files, present under ./data )
+    Extracts all possible events happened in Chat,
+    including message sent or people joined/ left
+    in case of group chat.
 '''
 
 
-def parseChatFile(content: str, idx: int, chat: Chat) -> int:
-    tree = BeautifulSoup(content, features='lxml')
-    for i, j in enumerate(tree.findAll('div',
-                                       attrs={'class': 'message default clearfix'})):
-        keepTrackOfMessages(*parseAMessage(j, idx + i), chat)
-    return idx + i + 1
+def getAllEvents(tree: BeautifulSoup) -> List[Tag]:
+    reg = reg_compile(r'^(message[0-9]{1,})$')
+    return sorted(
+        [
+            i
+            for i in tree.findAll('div',
+                                  attrs={'class': 'message default clearfix'})
+            +
+            tree.findAll('div',
+                         attrs={'class': 'message default clearfix joined'})
+            +
+            tree.findAll('div', attrs={'class': 'message service'})
+            if reg.match(i.get('id'))
+        ],
+        key=lambda e: int(e.get('id').replace('message', ''))
+    )
+
+
+def buildAccumulatedActivitySet(acc: List[Tag], cur: List[Tag]):
+    acc.extend(cur)
+    return acc
 
 
 '''
@@ -97,9 +123,14 @@ def getChatFiles(targetPath: str = './data') -> List[str]:
 
 def parseChat(targetPath: str = './data') -> Chat:
     chat = Chat([])
-    tmp = 0
+    target = []
     for i in getChatFiles(targetPath=targetPath):
-        tmp = parseChatFile(getFileContent(i), tmp, chat)
+        buildAccumulatedActivitySet(target,
+                                    getAllEvents(
+                                        BeautifulSoup(getFileContent(i), features='lxml')))
+    for i, j in enumerate(target):
+        if i > 0:
+            routeToProperHandler(j, target[i-1], chat)
     return chat
 
 
