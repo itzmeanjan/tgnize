@@ -8,6 +8,7 @@ from model.chat import Chat
 from model.message import Message
 from model.event import Event
 from re import compile as reg_compile
+from time import time
 try:
     from bs4 import BeautifulSoup
     from bs4.element import Tag
@@ -16,21 +17,23 @@ except ImportError as e:
     exit(1)
 
 
-def handleEvent(tag: Tag, chat: Chat, div_class: List[str] = ['message', 'service']):
-    chat.activities.append(
-        Event(int(tag.get('id').replace('message', ''), base=10),
-              tag.find('div', attrs={'class': 'body details'}).getText().strip())
+def handleEvent(tag: Tag, chat: Chat):
+    chat.push(
+        Event(
+            int(tag.get('id').replace('message', '')),
+            tag.find('div', attrs={'class': 'body details'}).getText().strip()
+        )
     )
 
 
-def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None, div_class: List[str] = ['message', 'default', 'clearfix']):
+def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None):
     if not prev_tag:
         txt = tag.find('div', attrs={'class': 'text'})
-        chat.activities.append(
+        chat.push(
             Message(
-                int(tag.get('id').replace('message', ''), base=10),
+                int(tag.get('id').replace('message', '')),
                 tag.find('div', attrs={
-                         'class': 'from_name'}).getText().strip(),
+                    'class': 'from_name'}).getText().strip(),
                 txt.getText().strip() if txt else None,
                 tag.find('div', attrs={'class': 'pull_right date details'}).get(
                     'title')
@@ -38,9 +41,9 @@ def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None, div_class: List[st
         )
     else:
         txt = prev_tag.find('div', attrs={'class': 'text'})
-        chat.activities.append(
+        chat.push(
             Message(
-                int(tag.get('id').replace('message', ''), base=10),
+                int(tag.get('id').replace('message', '')),
                 prev_tag.find('div', attrs={
                     'class': 'from_name'}).getText().strip(),
                 txt.getText().strip() if txt else None,
@@ -50,13 +53,21 @@ def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None, div_class: List[st
         )
 
 
-def routeToProperHandler(tag: Tag, prev_tag: Tag, chat: Chat):
+def routeToProperHandler(tag: Tag, prev_tag: Tag, chat: Chat) -> bool:
     if tag.get('class') == ['message', 'service']:
         handleEvent(tag, chat)
+        return False
     elif tag.get('class') == ['message', 'default', 'clearfix']:
         handleMessage(tag, chat)
+        return True
     else:
         handleMessage(tag, chat, prev_tag=prev_tag)
+        return False
+
+
+def buildAccumulatedActivitySet(acc: List[Tag], cur: List[Tag]):
+    acc.extend(cur)
+    return acc
 
 
 '''
@@ -68,25 +79,17 @@ def routeToProperHandler(tag: Tag, prev_tag: Tag, chat: Chat):
 
 def getAllEvents(tree: BeautifulSoup) -> List[Tag]:
     reg = reg_compile(r'^(message[0-9]{1,})$')
-    return sorted(
-        [
-            i
-            for i in tree.findAll('div',
-                                  attrs={'class': 'message default clearfix'})
-            +
-            tree.findAll('div',
-                         attrs={'class': 'message default clearfix joined'})
-            +
-            tree.findAll('div', attrs={'class': 'message service'})
-            if reg.match(i.get('id'))
-        ],
-        key=lambda e: int(e.get('id').replace('message', ''))
-    )
-
-
-def buildAccumulatedActivitySet(acc: List[Tag], cur: List[Tag]):
-    acc.extend(cur)
-    return acc
+    return [
+        i
+        for i in tree.findAll('div',
+                              attrs={'class': 'message default clearfix'})
+        +
+        tree.findAll('div',
+                     attrs={'class': 'message default clearfix joined'})
+        +
+        tree.findAll('div', attrs={'class': 'message service'})
+        if reg.match(i.get('id'))
+    ]
 
 
 '''
@@ -128,9 +131,10 @@ def parseChat(targetPath: str = './data') -> Chat:
         buildAccumulatedActivitySet(target,
                                     getAllEvents(
                                         BeautifulSoup(getFileContent(i), features='lxml')))
-    for i, j in enumerate(target):
-        if i > 0:
-            routeToProperHandler(j, target[i-1], chat)
+    last_msg_with_author = target[0]
+    for i in target:
+        if routeToProperHandler(i, last_msg_with_author, chat):
+            last_msg_with_author = i
     return chat
 
 
