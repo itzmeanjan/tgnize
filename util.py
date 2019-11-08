@@ -29,6 +29,8 @@ def handleEvent(tag: Tag, chat: Chat):
 def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None):
     if not prev_tag:
         txt = tag.find('div', attrs={'class': 'text'})
+        reply_to = tag.find(
+            'div', attrs={'class': 'reply_to_details'})
         chat.push(
             Message(
                 int(tag.get('id').replace('message', '')),
@@ -36,7 +38,8 @@ def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None):
                     'class': 'from_name'}).getText().strip(),
                 txt.getText().strip() if txt else None,
                 tag.find('div', attrs={'class': 'pull_right date details'}).get(
-                    'title')
+                    'title'),
+                reply_to.a.get('href') if reply_to else None
             )
         )
     else:

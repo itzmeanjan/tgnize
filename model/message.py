@@ -18,11 +18,12 @@ from activity import Activity
 
 
 class Message(Activity):
-    def __init__(self, idx: int, user: str, content: str, timestamp: str):
+    def __init__(self, idx: int, user: str, content: str, timestamp: str, replyTo: int = None):
         super().__init__(idx)
         self.user = user
         self.content = content
         self.timestamp = timestamp
+        self.replyTo = replyTo
 
     '''
         Parses message timestamp and returns # of seconds
