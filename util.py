@@ -56,6 +56,14 @@ def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None):
         )
 
 
+'''
+    Passes an extracted tag value to
+    one handler function, which
+    can handle this activity by
+    considering it either 
+'''
+
+
 def routeToProperHandler(tag: Tag, prev_tag: Tag, chat: Chat) -> bool:
     if tag.get('class') == ['message', 'service']:
         handleEvent(tag, chat)
@@ -68,31 +76,29 @@ def routeToProperHandler(tag: Tag, prev_tag: Tag, chat: Chat) -> bool:
         return False
 
 
-def buildAccumulatedActivitySet(acc: List[Tag], cur: List[Tag]):
-    acc.extend(cur)
-    return acc
-
-
 '''
-    Extracts all possible events happened in Chat,
+    Extracts all possible activities happened in Chat,
     including message sent or people joined/ left
-    in case of group chat.
+    in case of group chat etc.
+
+    And returns a list of those tags.
 '''
 
 
-def getAllEvents(tree: BeautifulSoup) -> List[Tag]:
+def getAllActivities(tree: BeautifulSoup) -> List[Tag]:
     reg = reg_compile(r'^(message[0-9]{1,})$')
-    return [
-        i
-        for i in tree.findAll('div',
-                              attrs={'class': 'message default clearfix'})
-        +
-        tree.findAll('div',
-                     attrs={'class': 'message default clearfix joined'})
-        +
-        tree.findAll('div', attrs={'class': 'message service'})
-        if reg.match(i.get('id'))
-    ]
+    tmp = tree.findAll('div',
+                       attrs={'class': 'message default clearfix'})
+    tmp.extend(tree.findAll('div',
+                            attrs={'class': 'message default clearfix joined'}))
+    tmp.extend(
+        [
+            i
+            for i in tree.findAll('div', attrs={'class': 'message service'})
+            if reg.match(i.get('id'))
+        ]
+    )
+    return tmp
 
 
 '''
@@ -129,15 +135,11 @@ def getChatFiles(targetPath: str = './data') -> List[str]:
 
 def parseChat(targetPath: str = './data') -> Chat:
     chat = Chat([])
-    target = []
+    last_msg_with_author = None
     for i in getChatFiles(targetPath=targetPath):
-        buildAccumulatedActivitySet(target,
-                                    getAllEvents(
-                                        BeautifulSoup(getFileContent(i), features='lxml')))
-    last_msg_with_author = target[0]
-    for i in target:
-        if routeToProperHandler(i, last_msg_with_author, chat):
-            last_msg_with_author = i
+        for j in getAllActivities(BeautifulSoup(getFileContent(i), features='lxml')):
+            if routeToProperHandler(j, last_msg_with_author, chat):
+                last_msg_with_author = j
     return chat
 
 
