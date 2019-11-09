@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
 from __future__ import annotations
-from datetime import datetime
+from datetime import datetime, time
 from activity import Activity
+from math import ceil
 
 '''
     This class is designed to hold 
@@ -25,14 +26,22 @@ class Message(Activity):
         self.timestamp = timestamp
         self.replyTo = replyTo
 
+    @property
+    def getDateTime(self) -> datetime:
+        return datetime.strptime(self.timestamp, '%d.%m.%Y %H:%M:%S')
+
     '''
         Parses message timestamp and returns # of seconds
         from Epoch ( try searching, if you don't understand
         what's it )
     '''
     @property
-    def parseTimeStamp(self) -> int:
-        return datetime.strptime(self.timestamp, '%d.%m.%Y %H:%M:%S').timestamp()
+    def getTimeStamp(self) -> int:
+        return ceil(self.getDateTime.timestamp())
+
+    @property
+    def getTime(self) -> time:
+        return self.getDateTime.time()
 
 
 if __name__ == '__main__':

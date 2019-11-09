@@ -91,7 +91,7 @@ class Chat:
 
     def getItem(self, idx: int) -> Activity:
         tmp = self.__getItem__(idx, 0, len(self.activities) - 1)
-        return self.activities[tmp] if tmp == -1 else None
+        return self.activities[tmp] if tmp != -1 else None
 
 
 if __name__ == '__main__':
