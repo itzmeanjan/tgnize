@@ -75,6 +75,14 @@ def splitMinuteBasedTrafficIntoFourParts(traffic: Counter) -> Tuple[Counter]:
 
 def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, targetPath: str) -> bool:
     first, second, third, fourth = splitMinuteBasedTrafficIntoFourParts(data)
+    x1 = sorted(first.keys())
+    y1 = [first[i] for i in x1]
+    x2 = sorted(second.keys())
+    y2 = [second[i] for i in x2]
+    x3 = sorted(third.keys())
+    y3 = [third[i] for i in x3]
+    x4 = sorted(fourth.keys())
+    y4 = [fourth[i] for i in x4]
     with plt.style.context('Solarize_Light2'):
         _, ((top_left, top_right), (bottom_left, bottom_right)) = plt.subplots(
             nrows=2, ncols=2, figsize=(24, 12), dpi=100)
@@ -90,10 +98,22 @@ def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, targetPath: str) 
         bottom_right.xaxis.set_major_locator(HourLocator())
         bottom_right.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
         bottom_right.xaxis.set_minor_locator(MinuteLocator())
-        top_left.plot(first.keys(), first.values(), 'r-', lw=.5)
-        top_right.plot(second.keys(), second.values(), 'r-', lw=.5)
-        bottom_left.plot(third.keys(), third.values(), 'r-', lw=.5)
-        bottom_right.plot(fourth.keys(), fourth.values(), 'r-', lw=.5)
+        top_left.set_xlabel('Time', labelpad=12)
+        top_left.set_ylabel('#-of Messages Sent', labelpad=12)
+        top_right.set_xlabel('Time', labelpad=12)
+        top_right.set_ylabel('#-of Messages Sent', labelpad=12)
+        bottom_left.set_xlabel('Time', labelpad=12)
+        bottom_left.set_ylabel('#-of Messages Sent', labelpad=12)
+        bottom_right.set_xlabel('Time', labelpad=12)
+        bottom_right.set_ylabel('#-of Messages Sent', labelpad=12)
+        top_left.set_title('Accumulated Chat Traffic by Minute', pad=12)
+        top_right.set_title('Accumulated Chat Traffic by Minute', pad=12)
+        bottom_left.set_title('Accumulated Chat Traffic by Minute', pad=12)
+        bottom_right.set_title('Accumulated Chat Traffic by Minute', pad=12)
+        top_left.plot(x1, y1, 'r-', lw=.5)
+        top_right.plot(x2, y2, 'r-', lw=.5)
+        bottom_left.plot(x3, y3, 'r-', lw=.5)
+        bottom_right.plot(x4, y4, 'r-', lw=.5)
         plt.tight_layout()
         plt.savefig(targetPath, bbox_inches='tight',
                     pad_inches=.2, quality=95, dpi=100)

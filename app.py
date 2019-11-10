@@ -15,11 +15,16 @@ def __calculateSuccess__(data: List[bool]) -> float:
     return reduce(lambda acc, cur: (acc + 1) if cur else acc, data, 0) / len(data) * 100
 
 
-def main():
-    return [
-        plotAccumulatedTrafficByMinuteFor24HourSpan(
-            extractMinuteBasedTraffic(parseChat()), './plots/accumulatedChatTrafficByMinute.jpg')
-    ]
+def main() -> float:
+    # a reusable reference, which will be used, over lifetime of this script,
+    chat = parseChat()
+    # holding full chat, under consideration
+    return __calculateSuccess__(
+        [
+            plotAccumulatedTrafficByMinuteFor24HourSpan(
+                extractMinuteBasedTraffic(chat), './plots/accumulatedChatTrafficByMinute.jpg')
+        ]
+    )
 
 
 if __name__ == '__main__':
