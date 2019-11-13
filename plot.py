@@ -9,6 +9,7 @@ from collections import Counter
 from typing import Tuple
 from datetime import datetime, date, time
 
+
 '''
     Takes an instance of Chat class,
     holding whole chat ( may be private or group ),
@@ -50,6 +51,29 @@ def extractMinuteBasedTraffic(chat: Chat) -> Counter:
     )
 
 
+'''
+    Extracts all messages sent by a certain chat participant
+    by its unique messageID & builds a frequency holder object,
+    depicting how many messages sent by a certain user over an
+    accumulated time period of a day ( i.e. 24 hours ), with minute level details.
+'''
+
+
+def extractMinuteBasedTrafficByUser(chat: Chat, user: str) -> Counter:
+    return Counter(
+        map(
+            lambda e:
+            e.getTime.replace(minute=(
+                e.getTime.minute + 1) if e.getTime.minute < 59 else e.getTime.minute, second=0)
+            if e.getTime.second >= 30
+            else e.getTime.replace(second=0),
+            map(lambda e:
+                chat.getActivity(e),
+                chat.getUser(user).messageIDs)
+        )
+    )
+
+
 def determineHalveOfDay(tm: time) -> int:
     return 0 \
         if tm >= time(0, 0) and tm <= time(5, 59) else 1 \
@@ -73,7 +97,7 @@ def splitMinuteBasedTrafficIntoFourParts(traffic: Counter) -> Tuple[Counter]:
     return first, second, third, fourth
 
 
-def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, targetPath: str) -> bool:
+def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targetPath: str) -> bool:
     first, second, third, fourth = splitMinuteBasedTrafficIntoFourParts(data)
     x1 = sorted(first.keys())
     y1 = [first[i] for i in x1]
@@ -106,10 +130,10 @@ def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, targetPath: str) 
         bottom_left.set_ylabel('#-of Messages Sent', labelpad=12)
         bottom_right.set_xlabel('Time', labelpad=12)
         bottom_right.set_ylabel('#-of Messages Sent', labelpad=12)
-        top_left.set_title('Accumulated Chat Traffic by Minute', pad=12)
-        top_right.set_title('Accumulated Chat Traffic by Minute', pad=12)
-        bottom_left.set_title('Accumulated Chat Traffic by Minute', pad=12)
-        bottom_right.set_title('Accumulated Chat Traffic by Minute', pad=12)
+        top_left.set_title(title, pad=12)
+        top_right.set_title(title, pad=12)
+        bottom_left.set_title(title, pad=12)
+        bottom_right.set_title(title, pad=12)
         top_left.plot(x1, y1, 'r-', lw=.5)
         top_right.plot(x2, y2, 'r-', lw=.5)
         bottom_left.plot(x3, y3, 'r-', lw=.5)
