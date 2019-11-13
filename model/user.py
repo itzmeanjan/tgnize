@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 from typing import List
-from message import Message
 
 
 class User:
-    def __init__(self, name: str, messages: List[Message]):
+    def __init__(self, name: str, messageIDs: List[int]):
         self.name = name
-        self.messages = messages
+        self.messageIDs = messageIDs
 
 
 if __name__ == '__main__':

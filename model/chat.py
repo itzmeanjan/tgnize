@@ -3,12 +3,14 @@
 from __future__ import annotations
 from typing import List
 from activity import Activity
+from user import User
 
 
 class Chat:
 
-    def __init__(self, activities: List[Activity]):
+    def __init__(self, activities: List[Activity], users: List[User]):
         self.activities = activities
+        self.users = users
 
     '''
         Gives us an iterator for traversing
@@ -58,7 +60,7 @@ class Chat:
 
     def isEvent(self, idx: int) -> bool:
         try:
-            self.getItem(idx).user
+            self.getActivity(idx).user
             return False
         except Exception:
             return True
@@ -71,16 +73,16 @@ class Chat:
         That's what is done here.
     '''
 
-    def __getItem__(self, idx: int, low: int, high: int) -> int:
+    def __getActivity__(self, idx: int, low: int, high: int) -> int:
         if low > high:
             return -1
         elif low == high:
             return low if self.activities[low].index == idx else -1
         else:
             mid = (low + high) // 2
-            return self.__getItem__(idx, low, mid) \
+            return self.__getActivity__(idx, low, mid) \
                 if self.activities[mid].index >= idx \
-                else self.__getItem__(idx, mid + 1, high)
+                else self.__getActivity__(idx, mid + 1, high)
 
     '''
         Finds an activity ( may be event or message ),
@@ -89,9 +91,75 @@ class Chat:
         application, while exporting chat, which is to be examined )
     '''
 
-    def getItem(self, idx: int) -> Activity:
-        tmp = self.__getItem__(idx, 0, len(self.activities) - 1)
+    def getActivity(self, idx: int) -> Activity:
+        tmp = self.__getActivity__(idx, 0, len(self.activities) - 1)
         return self.activities[tmp] if tmp != -1 else None
+
+    def __pushUserPosition__(self, user: str, low: int, high: int):
+        if low > high:
+            return 0
+        elif low == high:
+            return low if self.users[low].name > user else (low + 1)
+        else:
+            mid = (low + high) // 2
+            return self.__pushUserPosition__(user, low, mid) \
+                if self.users[mid].name > user \
+                else self.__pushUserPosition__(user, mid + 1, high)
+
+    def pushUser(self, user: User):
+        self.users.insert(self.__pushUserPosition__(
+            user.name, 0, len(self.users) - 1), user)
+
+    '''
+        
+    '''
+
+    def __getUser__(self, user: str, low: int, high: int):
+        if low > high:
+            return -1
+        elif low == high:
+            return low if self.users[low].name == user else -1
+        else:
+            mid = (low + high) // 2
+            return self.__getUser__(user, low, mid) \
+                if self.users[mid].name >= user \
+                else self.__getUser__(user, mid + 1, high)
+
+    '''
+        Looks up an User object by user name,
+        if it's present in self.records,
+        we simply return that object,
+        other wise we return None, denoting failure.
+    '''
+
+    def getUser(self, user: str) -> User:
+        _tmp = self.__getUser__(user, 0, len(self.users) - 1)
+        return self.users[_tmp] if _tmp != -1 else None
+
+    '''
+        Takes an user ( indentifying ) name & a message id, 
+        denoting that message is sent by that user,
+        and tries to lookup an User object with
+        that username.
+
+        Now there may be two conditions
+
+        Either User object with that name is already exisiting,
+        in that case, we simply update its messageID container list,
+        while pushing this one.
+
+        Or we need to create an User object with that name,
+        along with this messageID, and push that into proper
+        place while maintaining ascendingly sorted order of Users,
+        into self.users : List[User]
+    '''
+
+    def updateUserRecords(self, user: str, messageID: int):
+        _tmp = self.getUser(user)
+        if not _tmp:
+            self.pushUser(User(user, [messageID]))
+        else:
+            _tmp.messageIDs.append(messageID)
 
 
 if __name__ == '__main__':

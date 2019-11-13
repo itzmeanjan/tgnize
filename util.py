@@ -42,6 +42,9 @@ def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None):
                 reply_to.a.get('href') if reply_to else None
             )
         )
+        chat.updateUserRecords(tag.find('div', attrs={
+            'class': 'from_name'}).getText().strip(),
+            int(tag.get('id').replace('message', '')))
     else:
         txt = prev_tag.find('div', attrs={'class': 'text'})
         chat.push(
@@ -54,6 +57,9 @@ def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None):
                     'title')
             )
         )
+        chat.updateUserRecords(prev_tag.find('div', attrs={
+            'class': 'from_name'}).getText().strip(),
+            int(tag.get('id').replace('message', '')))
 
 
 '''
@@ -134,7 +140,7 @@ def getChatFiles(targetPath: str = './data') -> List[str]:
 
 
 def parseChat(targetPath: str = './data') -> Chat:
-    chat = Chat([])
+    chat = Chat([], [])
     last_msg_with_author = None
     for i in getChatFiles(targetPath=targetPath):
         for j in getAllActivities(BeautifulSoup(getFileContent(i), features='lxml')):
