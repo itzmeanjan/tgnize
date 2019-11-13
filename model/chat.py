@@ -95,6 +95,15 @@ class Chat:
         tmp = self.__getActivity__(idx, 0, len(self.activities) - 1)
         return self.activities[tmp] if tmp != -1 else None
 
+    '''
+        Helps in finding proper insertion position
+        for an User object, so that self.users
+        stays ascendingly sorted even after insertion at this
+        position.
+
+        This position finding is done using recursive mechanism ( binary search )
+    '''
+
     def __pushUserPosition__(self, user: str, low: int, high: int):
         if low > high:
             return 0
@@ -106,12 +115,22 @@ class Chat:
                 if self.users[mid].name > user \
                 else self.__pushUserPosition__(user, mid + 1, high)
 
+    '''
+        Pushes an User object into self.users,
+        such that they list stays ascendingly sorted
+        by user names.
+    '''
+
     def pushUser(self, user: User):
         self.users.insert(self.__pushUserPosition__(
             user.name, 0, len(self.users) - 1), user)
 
     '''
+        Finds an User object by its name,
+        in recursive fashion, using binary search mechanism.
         
+        Cause self.users is always kept sorted in ascending fashion
+        by user names.
     '''
 
     def __getUser__(self, user: str, low: int, high: int):
