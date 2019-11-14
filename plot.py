@@ -3,11 +3,23 @@
 from __future__ import annotations
 from matplotlib import pyplot as plt
 from matplotlib.dates import HourLocator, MinuteLocator, DateFormatter
-from matplotlib.ticker import NullFormatter, NullLocator
+from matplotlib.ticker import NullFormatter, NullLocator, MultipleLocator
 from model.chat import Chat
 from collections import Counter
 from typing import Tuple
 from datetime import datetime, date, time
+from math import ceil
+
+
+def _fillUpEmptyMinuteSlotsWithZeroTrafficDenotation(traffic: Counter) -> Counter:
+    if len(traffic.keys()) == 1440:
+        return traffic
+    else:
+        for h in range(24):
+            for m in range(60):
+                _tmp = time(h, m, 0)
+                traffic[_tmp] = traffic.get(_tmp, 0)
+        return traffic
 
 
 '''
@@ -37,17 +49,19 @@ from datetime import datetime, date, time
 
 
 def extractMinuteBasedTraffic(chat: Chat) -> Counter:
-    return Counter(
-        map(lambda e:
-            e.getTime.replace(minute=(
-                e.getTime.minute + 1) if e.getTime.minute < 59 else e.getTime.minute, second=0)
-            if e.getTime.second >= 30
-            else e.getTime.replace(second=0),
-            filter(lambda e:
-                   not chat.isEvent(e.index),
-                   chat.activities
-                   )
-            )
+    return _fillUpEmptyMinuteSlotsWithZeroTrafficDenotation(
+        Counter(
+            map(lambda e:
+                e.getTime.replace(minute=(
+                    e.getTime.minute + 1) if e.getTime.minute < 59 else e.getTime.minute, second=0)
+                if e.getTime.second >= 30
+                else e.getTime.replace(second=0),
+                filter(lambda e:
+                       not chat.isEvent(e.index),
+                       chat.activities
+                       )
+                )
+        )
     )
 
 
@@ -60,16 +74,18 @@ def extractMinuteBasedTraffic(chat: Chat) -> Counter:
 
 
 def extractMinuteBasedTrafficByUser(chat: Chat, user: str) -> Counter:
-    return Counter(
-        map(
-            lambda e:
-            e.getTime.replace(minute=(
-                e.getTime.minute + 1) if e.getTime.minute < 59 else e.getTime.minute, second=0)
-            if e.getTime.second >= 30
-            else e.getTime.replace(second=0),
-            map(lambda e:
-                chat.getActivity(e),
-                chat.getUser(user).messageIDs)
+    return _fillUpEmptyMinuteSlotsWithZeroTrafficDenotation(
+        Counter(
+            map(
+                lambda e:
+                e.getTime.replace(minute=(
+                    e.getTime.minute + 1) if e.getTime.minute < 59 else e.getTime.minute, second=0)
+                if e.getTime.second >= 30
+                else e.getTime.replace(second=0),
+                map(lambda e:
+                    chat.getActivity(e),
+                    chat.getUser(user).messageIDs)
+            )
         )
     )
 
@@ -98,51 +114,80 @@ def splitMinuteBasedTrafficIntoFourParts(traffic: Counter) -> Tuple[Counter]:
 
 
 def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targetPath: str) -> bool:
-    first, second, third, fourth = splitMinuteBasedTrafficIntoFourParts(data)
-    x1 = sorted(first.keys())
-    y1 = [first[i] for i in x1]
-    x2 = sorted(second.keys())
-    y2 = [second[i] for i in x2]
-    x3 = sorted(third.keys())
-    y3 = [third[i] for i in x3]
-    x4 = sorted(fourth.keys())
-    y4 = [fourth[i] for i in x4]
-    with plt.style.context('Solarize_Light2'):
-        _, ((top_left, top_right), (bottom_left, bottom_right)) = plt.subplots(
-            nrows=2, ncols=2, figsize=(24, 12), dpi=100)
-        top_left.xaxis.set_major_locator(HourLocator())
-        top_left.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
-        top_left.xaxis.set_minor_locator(MinuteLocator())
-        top_right.xaxis.set_major_locator(HourLocator())
-        top_right.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
-        top_right.xaxis.set_minor_locator(MinuteLocator())
-        bottom_left.xaxis.set_major_locator(HourLocator())
-        bottom_left.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
-        bottom_left.xaxis.set_minor_locator(MinuteLocator())
-        bottom_right.xaxis.set_major_locator(HourLocator())
-        bottom_right.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
-        bottom_right.xaxis.set_minor_locator(MinuteLocator())
-        top_left.set_xlabel('Time', labelpad=12)
-        top_left.set_ylabel('#-of Messages Sent', labelpad=12)
-        top_right.set_xlabel('Time', labelpad=12)
-        top_right.set_ylabel('#-of Messages Sent', labelpad=12)
-        bottom_left.set_xlabel('Time', labelpad=12)
-        bottom_left.set_ylabel('#-of Messages Sent', labelpad=12)
-        bottom_right.set_xlabel('Time', labelpad=12)
-        bottom_right.set_ylabel('#-of Messages Sent', labelpad=12)
-        top_left.set_title(title, pad=12)
-        top_right.set_title(title, pad=12)
-        bottom_left.set_title(title, pad=12)
-        bottom_right.set_title(title, pad=12)
-        top_left.plot(x1, y1, 'r-', lw=.5)
-        top_right.plot(x2, y2, 'r-', lw=.5)
-        bottom_left.plot(x3, y3, 'r-', lw=.5)
-        bottom_right.plot(x4, y4, 'r-', lw=.5)
-        plt.tight_layout()
-        plt.savefig(targetPath, bbox_inches='tight',
-                    pad_inches=.2, quality=95, dpi=100)
-        plt.close()
-    return True
+
+    # currently not in use, will try to use in near future
+    def _calculateMajorLocatorSpacingAlongX(minV: int, maxV: int, locatorCount: int = 5) -> int:
+        return ceil((minV + maxV) / locatorCount)
+
+    def _calculateMaxLimitAlongY(val: int) -> int:
+        return ceil(val + val / 10)
+
+    try:
+        first, second, third, fourth = splitMinuteBasedTrafficIntoFourParts(
+            data)
+        x1 = sorted(first.keys())
+        y1 = [first[i] for i in x1]
+        x2 = sorted(second.keys())
+        y2 = [second[i] for i in x2]
+        x3 = sorted(third.keys())
+        y3 = [third[i] for i in x3]
+        x4 = sorted(fourth.keys())
+        y4 = [fourth[i] for i in x4]
+        maxVal = _calculateMaxLimitAlongY(
+            max(max(y1), max(y2), max(y3), max(y4))
+        )
+        #_spaceBy = _calculateMajorLocatorSpacingAlongX(0, maxVal)
+        with plt.style.context('Solarize_Light2'):
+            _f, ((top_left, top_right), (bottom_left, bottom_right)) = plt.subplots(
+                nrows=2, ncols=2, figsize=(24, 12), dpi=100)
+            top_left.xaxis.set_major_locator(HourLocator())
+            top_left.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
+            top_left.xaxis.set_minor_locator(MinuteLocator())
+            top_right.xaxis.set_major_locator(HourLocator())
+            top_right.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
+            top_right.xaxis.set_minor_locator(MinuteLocator())
+            bottom_left.xaxis.set_major_locator(HourLocator())
+            bottom_left.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
+            bottom_left.xaxis.set_minor_locator(MinuteLocator())
+            bottom_right.xaxis.set_major_locator(HourLocator())
+            bottom_right.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
+            bottom_right.xaxis.set_minor_locator(MinuteLocator())
+            top_left.set_ylim(-1, maxVal)
+            top_right.set_ylim(-1, maxVal)
+            bottom_left.set_ylim(-1, maxVal)
+            bottom_right.set_ylim(-1, maxVal)
+            '''
+            top_left.yaxis.set_major_locator(MultipleLocator(_spaceBy))
+            top_right.yaxis.set_major_locator(MultipleLocator(_spaceBy))
+            bottom_left.yaxis.set_major_locator(MultipleLocator(_spaceBy))
+            bottom_right.yaxis.set_major_locator(MultipleLocator(_spaceBy))
+            '''
+            top_left.set_xlabel('Time', labelpad=12)
+            top_left.set_ylabel('#-of Messages Sent', labelpad=12)
+            top_right.set_xlabel('Time', labelpad=12)
+            top_right.set_ylabel('#-of Messages Sent', labelpad=12)
+            bottom_left.set_xlabel('Time', labelpad=12)
+            bottom_left.set_ylabel('#-of Messages Sent', labelpad=12)
+            bottom_right.set_xlabel('Time', labelpad=12)
+            bottom_right.set_ylabel('#-of Messages Sent', labelpad=12)
+            top_left.set_title(title, pad=12)
+            top_right.set_title(title, pad=12)
+            bottom_left.set_title(title, pad=12)
+            bottom_right.set_title(title, pad=12)
+            top_left.plot(x1, y1, 'r-', lw=.5)
+            top_right.plot(x2, y2, 'r-', lw=.5)
+            bottom_left.plot(x3, y3, 'r-', lw=.5)
+            bottom_right.plot(x4, y4, 'r-', lw=.5)
+            plt.tight_layout()
+            plt.savefig(targetPath, bbox_inches='tight',
+                        pad_inches=.2, quality=95, dpi=100)
+            # this is really important, otherwise all figures will stay in memory
+            plt.close(_f)
+            # which will cause consumption of huge chunk of memory
+        return True
+    except Exception as e:
+        print(e)
+        return False
 
 
 if __name__ == '__main__':
