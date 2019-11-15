@@ -140,7 +140,7 @@ def getChatFiles(targetPath: str = './data') -> List[str]:
 
 
 def parseChat(targetPath: str = './data') -> Chat:
-    chat = Chat([], [])
+    chat = Chat()
     last_msg_with_author = None
     for i in getChatFiles(targetPath=targetPath):
         for j in getAllActivities(BeautifulSoup(getFileContent(i), features='lxml')):

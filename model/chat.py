@@ -8,7 +8,7 @@ from user import User
 
 class Chat:
 
-    def __init__(self, activities: List[Activity], users: List[User]):
+    def __init__(self, activities: List[Activity] = [], users: List[User] = []):
         self.activities = activities
         self.users = users
         self._activityCount = len(self.activities)

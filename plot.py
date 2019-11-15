@@ -89,6 +89,21 @@ def extractMinuteBasedTrafficByUser(chat: Chat, user: str) -> Counter:
     )
 
 
+'''
+    For sake of ease I'm splitting a 24 hour 
+    lengthy day into 4 equal parts, which are as follows
+
+    0 -> 00:00 - 05:59
+    1 -> 06:00 - 11:59
+    2 -> 12:00 - 17:59
+    3 -> 18:00 - 23:59
+
+    Now we need to map any HH:MM formatted 
+    time into any of those four halves, which will be
+    indicated by 0 or 1 or 2 or 3
+'''
+
+
 def determineHalveOfDay(tm: time) -> int:
     return 0 \
         if tm >= time(0, 0) and tm <= time(5, 59) else 1 \
