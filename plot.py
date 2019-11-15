@@ -99,7 +99,7 @@ def extractMinuteBasedTrafficByUser(chat: Chat, user: str) -> Counter:
     3 -> 18:00 - 23:59
 
     Now we need to map any HH:MM formatted 
-    time into any of those four halves, which will be
+    time into one of those four halves, which will be
     indicated by 0 or 1 or 2 or 3
 '''
 
