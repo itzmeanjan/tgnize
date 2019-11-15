@@ -11,10 +11,20 @@ class Chat:
     def __init__(self, activities: List[Activity], users: List[User]):
         self.activities = activities
         self.users = users
+        self._activityCount = len(self.activities)
+        self._userCount = len(self.users)
+
+    @property
+    def activityCount(self) -> int:
+        return self._activityCount
+
+    @property
+    def userCount(self) -> int:
+        return self._userCount
 
     '''
         Gives us an iterator for traversing
-        over an instance of Chat object 
+        over an instance of Chat object
     '''
 
     def __iter__(self):
@@ -49,6 +59,7 @@ class Chat:
     def push(self, item: Activity):
         self.activities.insert(self.__getPushPosition__(
             item.index, 0, len(self.activities) - 1), item)
+        self._activityCount += 1
 
     '''
         Denotes whether this activity is an Event
@@ -124,6 +135,7 @@ class Chat:
     def pushUser(self, user: User):
         self.users.insert(self.__pushUserPosition__(
             user.name, 0, len(self.users) - 1), user)
+        self._userCount += 1
 
     '''
         Finds an User object by its name,

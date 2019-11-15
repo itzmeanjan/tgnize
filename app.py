@@ -6,26 +6,25 @@ from functools import reduce
 from util import parseChat
 from plot import extractMinuteBasedTraffic, extractMinuteBasedTrafficByUser, plotAccumulatedTrafficByMinuteFor24HourSpan
 
-'''
-    Main entry point of script
-'''
-
 
 def _getEscapedName(proposedName: str) -> str:
     return proposedName.translate(
         proposedName.maketrans(
             {'/': r'_',
              '\\': r'_',
-             ' ': r'_',
-             '\t': r'_',
-             '\n': r'_',
-             '\r': r'_'}
+             ' ': r'_'
+             }
         )
     )
 
 
 def __calculateSuccess__(data: List[bool]) -> float:
     return reduce(lambda acc, cur: (acc + 1) if cur else acc, data, 0) / len(data) * 100
+
+
+'''
+    Main entry point of script
+'''
 
 
 def main() -> float:
@@ -37,7 +36,7 @@ def main() -> float:
         plotAccumulatedTrafficByMinuteFor24HourSpan(
             extractMinuteBasedTraffic(chat),
             'Accumulated Chat Traffic by Minute',
-            './plots/accumulatedChatTrafficByMinute.jpg'
+            './plots/accumulatedChatTrafficByMinute.svg'
         )
     )
     for i in chat.users:
@@ -46,7 +45,7 @@ def main() -> float:
                 extractMinuteBasedTrafficByUser(chat, i.name),
                 'Accumulated Chat Traffic by Minute for {}'.format(
                     i.name[:8] + '...' if len(i.name) > 10 else i.name),
-                './plots/accumulatedChatTrafficByMinuteFor{}.jpg'.format(
+                './plots/accumulatedChatTrafficByMinuteFor{}.svg'.format(
                     _getEscapedName(i.name))
             )
         )

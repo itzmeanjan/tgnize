@@ -16,9 +16,8 @@ def _fillUpEmptyMinuteSlotsWithZeroTrafficDenotation(traffic: Counter) -> Counte
         return traffic
     else:
         for h in range(24):
-            for m in range(60):
-                _tmp = time(h, m, 0)
-                traffic[_tmp] = traffic.get(_tmp, 0)
+            _tmp = time(h, 0, 0)
+            traffic[_tmp] = traffic.get(_tmp, 0)
         return traffic
 
 
@@ -174,10 +173,14 @@ def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targe
             top_right.set_title(title, pad=12)
             bottom_left.set_title(title, pad=12)
             bottom_right.set_title(title, pad=12)
-            top_left.plot(x1, y1, 'r-', lw=.5)
-            top_right.plot(x2, y2, 'r-', lw=.5)
-            bottom_left.plot(x3, y3, 'r-', lw=.5)
-            bottom_right.plot(x4, y4, 'r-', lw=.5)
+            top_left.plot(x1, y1, linestyle='-',
+                          color='tomato', linewidth=.5, marker='.', markerfacecolor='red', markersize=2)
+            top_right.plot(x2, y2, linestyle='-',
+                           color='tomato', linewidth=.5, marker='.', markerfacecolor='red', markersize=2)
+            bottom_left.plot(x3, y3, linestyle='-',
+                             color='tomato', linewidth=.5, marker='.', markerfacecolor='red', markersize=2)
+            bottom_right.plot(x4, y4, linestyle='-',
+                              color='tomato', linewidth=.5, marker='.', markerfacecolor='red', markersize=2)
             plt.tight_layout()
             plt.savefig(targetPath, bbox_inches='tight',
                         pad_inches=.2, quality=95, dpi=100)
@@ -185,8 +188,7 @@ def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targe
             plt.close(_f)
             # which will cause consumption of huge chunk of memory
         return True
-    except Exception as e:
-        print(e)
+    except Exception:
         return False
 
 
