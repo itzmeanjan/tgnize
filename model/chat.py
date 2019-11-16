@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import List
 from activity import Activity
 from user import User
+from re import compile as reg_compile
 
 
 class Chat:
@@ -42,12 +43,15 @@ class Chat:
         if low > high:
             return 0
         elif low == high:
-            return low if self.activities[low].index > idx else (low + 1)
+            return low if self.activities[low].index >= idx else (low + 1)
         else:
-            mid = (low + high) // 2
-            return self.__getPushPosition__(idx, low, mid) \
-                if self.activities[mid].index > idx \
-                else self.__getPushPosition__(idx, mid + 1, high)
+            mid = low + (high - low) // 2
+            if self.activities[mid].index == idx:
+                return mid + 1
+            else:
+                return self.__getPushPosition__(idx, low, mid) \
+                    if self.activities[mid].index > idx \
+                    else self.__getPushPosition__(idx, mid + 1, high)
 
     '''
         Pushes an instance of Activity subclass ( either Event or Message )
@@ -79,7 +83,7 @@ class Chat:
     '''
         As all entries made into chat holder are organized in
         sorted fashion in terms of their index number,
-        we can reduce search time by doing it using binary search.
+        we can reduce search time by doing it using interpolation search.
 
         That's what is done here.
     '''
@@ -90,10 +94,18 @@ class Chat:
         elif low == high:
             return low if self.activities[low].index == idx else -1
         else:
-            mid = (low + high) // 2
-            return self.__getActivity__(idx, low, mid) \
-                if self.activities[mid].index >= idx \
-                else self.__getActivity__(idx, mid + 1, high)
+            mid = low + \
+                ((high - low) * (idx - self.activities[low].index)) \
+                // (self.activities[high].index -
+                    self.activities[low].index)
+            if mid < low or mid > high:
+                return -1
+            if self.activities[mid].index == idx:
+                return mid
+            else:
+                return self.__getActivity__(idx, low, mid - 1) \
+                    if self.activities[mid].index > idx \
+                    else self.__getActivity__(idx, mid + 1, high)
 
     '''
         Finds an activity ( may be event or message ),
@@ -167,6 +179,14 @@ class Chat:
         _tmp = self.__getUser__(user, 0, len(self.users) - 1)
         return self.users[_tmp] if _tmp != -1 else None
 
+    def extractUserAndBotNameFromMessage(self, username: str) -> Tuple[str, str]:
+        regex = reg_compile(r'(.+)(?=\svia\s)\svia\s(.+)')
+        return regex.search(username).groups()
+
+    def isAViaBotMessage(self, username: str) -> bool:
+        regex = reg_compile(r'(.+)(?=\svia\s)\svia\s(.+)')
+        return True if regex.search(username) else False
+
     '''
         Takes an user ( indentifying ) name & a message id, 
         denoting that message is sent by that user,
@@ -186,6 +206,8 @@ class Chat:
     '''
 
     def updateUserRecords(self, user: str, messageID: int):
+        if self.isAViaBotMessage(user):
+            pass
         _tmp = self.getUser(user)
         if not _tmp:
             self.pushUser(User(user, [messageID]))
