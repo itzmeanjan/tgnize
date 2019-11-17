@@ -179,9 +179,38 @@ class Chat:
         _tmp = self.__getUser__(user, 0, len(self.users) - 1)
         return self.users[_tmp] if _tmp != -1 else None
 
+    '''
+        In the method, immediately below of it, we tried
+        understanding whether this message is via any bot or not.
+
+        If yes, we go for extraction of two important
+        components
+
+        `x via @y` i.e. `x` = username & `y` = botname
+
+        We'll use a regex for that purpose, and a tuple
+        holding both of them ( of course in ordered fashion ),
+        is to be returned
+
+        Before invoking this method, make sure you're getting true
+        by invoking method, placed just below it. 
+    '''
+
     def extractUserAndBotNameFromMessage(self, username: str) -> Tuple[str, str]:
         regex = reg_compile(r'(.+)(?=\svia\s)\svia\s(.+)')
         return regex.search(username).groups()
+
+    '''
+        Checks whether this message is sent by using any bot or not,
+        mostly gifs or other kind of memes are sent via different telegram bots.
+
+        In those cases, username is like 
+
+        `x via @y`, where `x` is actual user account name & `y` is botname
+
+        If that's the case for this message, we'll return True,
+        else False, to be returned. 
+    '''
 
     def isAViaBotMessage(self, username: str) -> bool:
         regex = reg_compile(r'(.+)(?=\svia\s)\svia\s(.+)')
@@ -206,13 +235,22 @@ class Chat:
     '''
 
     def updateUserRecords(self, user: str, messageID: int):
+        _tmp = None
         if self.isAViaBotMessage(user):
-            pass
-        _tmp = self.getUser(user)
-        if not _tmp:
-            self.pushUser(User(user, [messageID]))
+            userName, botName = self.extractUserAndBotNameFromMessage(user)
+            _tmp = self.getUser(userName)
+            if not _tmp:
+                _tmpUser = User(userName)
+                _tmpUser.updateViaBotMessages(botName, messageID)
+                self.pushUser(_tmpUser)
+            else:
+                _tmp.updateViaBotMessages(botName, messageID)
         else:
-            _tmp.messageIDs.append(messageID)
+            _tmp = self.getUser(user)
+            if not _tmp:
+                self.pushUser(User(user, [messageID]))
+            else:
+                _tmp.messageIDs.append(messageID)
 
 
 if __name__ == '__main__':
