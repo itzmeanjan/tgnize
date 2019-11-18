@@ -9,6 +9,7 @@ from collections import Counter
 from typing import Tuple
 from datetime import datetime, date, time
 from math import ceil
+from itertools import chain
 
 
 def _fillUpEmptyMinuteSlotsWithZeroTrafficDenotation(traffic: Counter) -> Counter:
@@ -73,6 +74,7 @@ def extractMinuteBasedTraffic(chat: Chat) -> Counter:
 
 
 def extractMinuteBasedTrafficByUser(chat: Chat, user: str) -> Counter:
+    userObj = chat.getUser(user)
     return _fillUpEmptyMinuteSlotsWithZeroTrafficDenotation(
         Counter(
             map(
@@ -81,9 +83,13 @@ def extractMinuteBasedTrafficByUser(chat: Chat, user: str) -> Counter:
                     e.getTime.minute + 1) if e.getTime.minute < 59 else e.getTime.minute, second=0)
                 if e.getTime.second >= 30
                 else e.getTime.replace(second=0),
-                map(lambda e:
-                    chat.getActivity(e),
-                    chat.getUser(user).messageIDs)
+                chain(
+                    map(lambda e:
+                        chat.getActivity(e),
+                        userObj.messageIDs),
+                    map(lambda e: chat.getActivity(e),
+                        userObj.getViaBotMessageIds)
+                )
             )
         )
     )

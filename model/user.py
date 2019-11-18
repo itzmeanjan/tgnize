@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from typing import List, Dict
+from itertools import chain
 
 '''
     Holds record of messages sent by
@@ -16,8 +17,16 @@ class User:
         self.viaBotMessages = viaBot
 
     @property
-    def messageCount(self):
+    def messageCount(self) -> int:
         return len(self.messageIDs)
+
+    @property
+    def viaBotMessageCount(self) -> int:
+        return sum([len(i) for i in self.viaBotMessages.values()])
+
+    @property
+    def getViaBotMessageIds(self) -> chain:
+        return chain(*[i for i in self.viaBotMessages.values()])
 
     def updateViaBotMessages(self, botName: str, messageId: int):
         self.viaBotMessages[botName] = self.viaBotMessages.get(
