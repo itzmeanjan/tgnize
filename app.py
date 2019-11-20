@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import List
 from functools import reduce
 from util import parseChat
-from plotting_scripts.minuteBasedAccumulatedTraffic import extractMinuteBasedTraffic, extractMinuteBasedTrafficByUser, plotAccumulatedTrafficByMinuteFor24HourSpan, plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan
+from plotting_scripts.minuteBasedAccumulatedTraffic import extractMinuteBasedTraffic, extractMinuteBasedTrafficByUser, plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan
 
 
 def _getEscapedName(proposedName: str) -> str:
@@ -39,6 +39,15 @@ def main() -> float:
             './plots/accumulatedChatTrafficByMinute.gif'
         )
     )
+    for i in chat.getTopXParticipants(5):
+        _result.append(
+            plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
+                extractMinuteBasedTrafficByUser(chat, i),
+                'Accumulated Chat Traffic by Minute for {}'.format(i),
+                './plots/accumulatedChatTrafficByMinuteFor{}.gif'.format(
+                    _getEscapedName(i))
+            )
+        )
     '''
     for i in chat.users:
         _result.append(

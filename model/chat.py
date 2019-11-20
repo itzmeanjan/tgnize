@@ -280,6 +280,23 @@ class Chat:
             else:
                 _tmp.messageIDs.append(messageID)
 
+    def getTopXParticipants(self, x: int) -> List[str]:
+        def _findReplacableCandidate(current: int) -> str:
+            _candidates = sorted(reduce(lambda acc, cur: acc + [cur] if _tmp[cur] <= current else acc, _tmp, []))
+            return None if not _candidates else _candidates[-1]
+
+        x = 1 if x <= 0 else x
+        _tmp = {}
+        for i in self.users:
+            if len(_tmp) < x:
+                _tmp[i.name] = i.totalMessageCount
+            else:
+                _candidate = _findReplacableCandidate(i.totalMessageCount)
+                if _candidate:
+                    _tmp.pop(_candidate)
+                    _tmp[i.name] = i.totalMessageCount
+        return [i for i in _tmp.keys()]
+
 
 if __name__ == '__main__':
     print('[!]This module is expected to be used as a backend handler')

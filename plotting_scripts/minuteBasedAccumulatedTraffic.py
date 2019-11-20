@@ -114,14 +114,15 @@ def extractMinuteBasedTrafficByUser(chat: Chat, user: str) -> Counter:
     indicated by 0 or 1 or 2 or 3
 '''
 
-
+'''
 def determineHalveOfDay(tm: time) -> int:
     return 0 \
         if tm >= time(0, 0) and tm <= time(5, 59) else 1 \
         if tm >= time(6, 0) and tm <= time(11, 59) else 2 \
         if tm >= time(12, 0) and tm <= time(17, 59) else 3
+'''
 
-
+'''
 def splitMinuteBasedTrafficIntoFourParts(traffic: Counter) -> Tuple[Counter]:
     first, second, third, fourth = Counter(
         []), Counter([]), Counter([]), Counter([])
@@ -136,8 +137,9 @@ def splitMinuteBasedTrafficIntoFourParts(traffic: Counter) -> Tuple[Counter]:
         else:
             fourth[datetime.combine(date(2000, 1, 1), i)] = j
     return first, second, third, fourth
+'''
 
-
+'''
 def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targetPath: str) -> bool:
 
     # currently not in use, will try to use in near future
@@ -181,12 +183,12 @@ def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targe
             top_right.set_ylim(-1, maxVal)
             bottom_left.set_ylim(-1, maxVal)
             bottom_right.set_ylim(-1, maxVal)
-            '''
+            \'''
             top_left.yaxis.set_major_locator(MultipleLocator(_spaceBy))
             top_right.yaxis.set_major_locator(MultipleLocator(_spaceBy))
             bottom_left.yaxis.set_major_locator(MultipleLocator(_spaceBy))
             bottom_right.yaxis.set_major_locator(MultipleLocator(_spaceBy))
-            '''
+            \'''
             top_left.set_xlabel('Time', labelpad=12)
             top_left.set_ylabel('#-of Messages Sent', labelpad=12)
             top_right.set_xlabel('Time', labelpad=12)
@@ -216,7 +218,7 @@ def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targe
         return True
     except Exception:
         return False
-
+'''
 
 def plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targetPath: str) -> bool:
     def _calculateMaxLimitAlongY(val: int) -> int:
