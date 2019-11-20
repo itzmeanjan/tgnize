@@ -16,11 +16,8 @@ class DataRange:
     def getHigh(self) -> int:
         return self._high
 
-    def setLow(self, low: int):
-        self._low = low % 1440
-
     def setHigh(self, high: int):
-        self._high = high %1440
+        self._high = high % 1440 if high > 1439 else high
 
 
 if __name__ == '__main__':

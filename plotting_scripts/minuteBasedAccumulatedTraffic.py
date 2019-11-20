@@ -226,16 +226,18 @@ def plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, t
         axes.clear()
         axes.xaxis.set_major_locator(HourLocator())
         axes.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
-        axes.xaxis.set_minor_locator(MinuteLocator())
+        #axes.xaxis.set_minor_locator(MinuteLocator())
         axes.set_ylim(-1, maxVal)
-        axes.set_xlabel('Time', labelpad=12)
-        axes.set_ylabel('#-of Messages Sent', labelpad=12)
+        axes.set_xlabel('Time', labelpad=12, fontdict={'size': 16})
+        axes.set_ylabel('#-of Messages Sent', labelpad=12, fontdict={'size': 16})
         axes.set_title(title, pad=12)
+        axes.tick_params(axis='x', which='major', labelsize=12, labelrotation=75, labelcolor='black')
+        axes.tick_params(axis='y', which='major', labelsize=14, labelcolor='black')
         axes.plot(x[dataRange.getLow: (dataRange.getHigh + 1)],
                   y[dataRange.getLow: (dataRange.getHigh + 1)], linestyle='-',
-                  color='tomato', linewidth=2, marker='o',
-                  markerfacecolor='red', markersize=10)
-        dataRange.setLow(dataRange.getHigh)
+                  color='tomato', linewidth=1.2, marker='o',
+                  markerfacecolor='red', markersize=5)
+        #dataRange.setLow(dataRange.getHigh)
         dataRange.setHigh((dataRange.getHigh + 60))
 
     try:
@@ -246,12 +248,11 @@ def plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, t
         with plt.style.context('Solarize_Light2'):
             fig = plt.figure(figsize=(24, 12), dpi=100)
             axes = fig.add_subplot(1, 1, 1)
-            _anim = anim.FuncAnimation(fig, _animate, interval=500)
-            _anim.save(targetPath, dpi=100)
+            _anim = anim.FuncAnimation(fig, _animate, interval=1500, frames=24)
+            _anim.save(targetPath, writer='imagemagick_file', dpi=100)
             plt.close(fig)
         return True
-    except Exception as e:
-        print(e)
+    except Exception:
         return False
 
 

@@ -36,7 +36,7 @@ def main() -> float:
         plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
             extractMinuteBasedTraffic(chat),
             'Accumulated Chat Traffic by Minute',
-            './plots/accumulatedChatTrafficByMinute.mp4'
+            './plots/accumulatedChatTrafficByMinute.gif'
         )
     )
     '''
