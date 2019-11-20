@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import List
 from functools import reduce
 from util import parseChat
-from plot import extractMinuteBasedTraffic, extractMinuteBasedTrafficByUser, plotAccumulatedTrafficByMinuteFor24HourSpan
+from plotting_scripts.minuteBasedAccumulatedTraffic import extractMinuteBasedTraffic, extractMinuteBasedTrafficByUser, plotAccumulatedTrafficByMinuteFor24HourSpan, plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan
 
 
 def _getEscapedName(proposedName: str) -> str:
@@ -33,22 +33,24 @@ def main() -> float:
     # holding full chat, under consideration
     _result = []
     _result.append(
-        plotAccumulatedTrafficByMinuteFor24HourSpan(
+        plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
             extractMinuteBasedTraffic(chat),
             'Accumulated Chat Traffic by Minute',
-            './plots/accumulatedChatTrafficByMinute.svg'
+            './plots/accumulatedChatTrafficByMinute.mp4'
         )
     )
+    '''
     for i in chat.users:
         _result.append(
-            plotAccumulatedTrafficByMinuteFor24HourSpan(
+            plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
                 extractMinuteBasedTrafficByUser(chat, i.name),
                 'Accumulated Chat Traffic by Minute for {}'.format(
                     i.name[:8] + '...' if len(i.name) > 10 else i.name),
-                './plots/accumulatedChatTrafficByMinuteFor{}.svg'.format(
+                './plots/accumulatedChatTrafficByMinuteFor{}.gif'.format(
                     _getEscapedName(i.name))
             )
         )
+    '''
     return __calculateSuccess__(_result)
 
 

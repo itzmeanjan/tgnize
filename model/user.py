@@ -25,12 +25,16 @@ class User:
         return sum([len(i) for i in self.viaBotMessages.values()])
 
     @property
+    def totalMessageCount(self) -> int:
+        return self.messageCount + self.viaBotMessageCount
+
+    @property
     def getViaBotMessageIds(self) -> chain:
         return chain(*[i for i in self.viaBotMessages.values()])
 
     def updateViaBotMessages(self, botName: str, messageId: int):
         self.viaBotMessages[botName] = self.viaBotMessages.get(
-            botName, []).append(messageId)
+            botName, []) + [messageId]
 
 
 if __name__ == '__main__':
