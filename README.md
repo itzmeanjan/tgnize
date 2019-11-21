@@ -26,9 +26,9 @@ I suggest you not to use it for manipulating someone else. Thank you for underst
 ## data source
 Here I'm using [Devs Chat](https://t.me/joinchat/BkBvqUQUj4VKPmFSSNPQSw)'s, exported Chat data set for testing these scripts. So all plots ( to be :wink: ) generated, present in this repository, are result of application of scripts on [Devs Chat](https://t.me/joinchat/BkBvqUQUj4VKPmFSSNPQSw)'s exported Chat data.
 
-~Template data set is present [here](./data). It holds all messages of [Devs Chat](https://t.me/joinchat/BkBvqUQUj4VKPmFSSNPQSw) upto _03/11/2019_ from initialization of group.~
+~Template data set is present [here](.). It holds all messages of [Devs Chat](https://t.me/joinchat/BkBvqUQUj4VKPmFSSNPQSw) upto _03/11/2019_ from initialization of group.~
 
-For respecting privacy of all users, I'm removing that data source from this public repo. Export chat for your own need.
+**For respecting privacy of all users, I'm removing that data source from this public repo. Export chat data for your own need.**
 
 ### exporting chat
 For exporting chat data for [Devs Chat](https://t.me/joinchat/BkBvqUQUj4VKPmFSSNPQSw) group of Telegram, I used Official Telegram Desktop Client. Exporting was done, while only including text messages _( no images, videos or audios )_, which are nothing but a bunch of HTML files.
