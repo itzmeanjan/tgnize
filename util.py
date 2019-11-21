@@ -66,7 +66,7 @@ def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None):
     Passes an extracted tag value to
     one handler function, which
     can handle this activity by
-    considering it either 
+    considering it either
 '''
 
 
@@ -120,13 +120,13 @@ def getFileContent(targetPath: str) -> str:
 
 '''
     Returns a collection of file paths
-    which are holding exported telegram chat 
+    which are holding exported telegram chat
     ( i.e. group or private ), *.html files,
     present under ./data
 '''
 
 
-def getChatFiles(targetPath: str = './data') -> List[str]:
+def getChatFiles(targetPath: str) -> List[str]:
     return [join(abspath(targetPath), i)
             for i in listdir(targetPath)
             if i.startswith('messages') and i.endswith('html')]
@@ -139,10 +139,10 @@ def getChatFiles(targetPath: str = './data') -> List[str]:
 '''
 
 
-def parseChat(targetPath: str = './data') -> Chat:
+def parseChat(targetPath: str) -> Chat:
     chat = Chat()
     last_msg_with_author = None
-    for i in getChatFiles(targetPath=targetPath):
+    for i in getChatFiles(targetPath):
         for j in getAllActivities(BeautifulSoup(getFileContent(i), features='lxml')):
             if routeToProperHandler(j, last_msg_with_author, chat):
                 last_msg_with_author = j

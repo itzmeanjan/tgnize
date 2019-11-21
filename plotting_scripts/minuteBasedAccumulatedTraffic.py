@@ -100,6 +100,43 @@ def extractMinuteBasedTrafficByUser(chat: Chat, user: str) -> Counter:
     )
 
 
+def plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targetPath: str) -> bool:
+    def _calculateMaxLimitAlongY(val: int) -> int:
+        return ceil(val + val / 10)
+
+    def _animate(i: int):
+        axes.clear()
+        axes.xaxis.set_major_locator(HourLocator())
+        axes.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
+        #axes.xaxis.set_minor_locator(MinuteLocator())
+        axes.set_ylim(-1, maxVal)
+        axes.set_xlabel('Time', labelpad=12, fontdict={'size': 16})
+        axes.set_ylabel('#-of Messages Sent', labelpad=12, fontdict={'size': 16})
+        axes.set_title(title, pad=12)
+        axes.tick_params(axis='x', which='major', labelsize=12, labelrotation=75, labelcolor='black')
+        axes.tick_params(axis='y', which='major', labelsize=14, labelcolor='black')
+        axes.plot(x[dataRange.getLow: (dataRange.getHigh + 1)],
+                  y[dataRange.getLow: (dataRange.getHigh + 1)], linestyle='-',
+                  color='tomato', linewidth=1.2, marker='o',
+                  markerfacecolor='red', markersize=5)
+        #dataRange.setLow(dataRange.getHigh)
+        dataRange.setHigh((dataRange.getHigh + 60))
+
+    try:
+        x = sorted(data.keys())
+        y = [data[i] for i in x]
+        dataRange = DataRange(0, 59)
+        maxVal = _calculateMaxLimitAlongY(max(y))
+        with plt.style.context('Solarize_Light2'):
+            fig = plt.figure(figsize=(24, 12), dpi=100)
+            axes = fig.add_subplot(1, 1, 1)
+            _anim = anim.FuncAnimation(fig, _animate, interval=1500, frames=24)
+            _anim.save(targetPath, writer='imagemagick_file', dpi=100)
+            plt.close(fig)
+        return True
+    except Exception:
+        return False
+
 '''
     For sake of ease I'm splitting a 24 hour
     lengthy day into 4 equal parts, which are as follows
@@ -219,43 +256,6 @@ def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targe
     except Exception:
         return False
 '''
-
-def plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targetPath: str) -> bool:
-    def _calculateMaxLimitAlongY(val: int) -> int:
-        return ceil(val + val / 10)
-
-    def _animate(i: int):
-        axes.clear()
-        axes.xaxis.set_major_locator(HourLocator())
-        axes.xaxis.set_major_formatter(DateFormatter('%I:%M %p'))
-        #axes.xaxis.set_minor_locator(MinuteLocator())
-        axes.set_ylim(-1, maxVal)
-        axes.set_xlabel('Time', labelpad=12, fontdict={'size': 16})
-        axes.set_ylabel('#-of Messages Sent', labelpad=12, fontdict={'size': 16})
-        axes.set_title(title, pad=12)
-        axes.tick_params(axis='x', which='major', labelsize=12, labelrotation=75, labelcolor='black')
-        axes.tick_params(axis='y', which='major', labelsize=14, labelcolor='black')
-        axes.plot(x[dataRange.getLow: (dataRange.getHigh + 1)],
-                  y[dataRange.getLow: (dataRange.getHigh + 1)], linestyle='-',
-                  color='tomato', linewidth=1.2, marker='o',
-                  markerfacecolor='red', markersize=5)
-        #dataRange.setLow(dataRange.getHigh)
-        dataRange.setHigh((dataRange.getHigh + 60))
-
-    try:
-        x = sorted(data.keys())
-        y = [data[i] for i in x]
-        dataRange = DataRange(0, 59)
-        maxVal = _calculateMaxLimitAlongY(max(y))
-        with plt.style.context('Solarize_Light2'):
-            fig = plt.figure(figsize=(24, 12), dpi=100)
-            axes = fig.add_subplot(1, 1, 1)
-            _anim = anim.FuncAnimation(fig, _animate, interval=1500, frames=24)
-            _anim.save(targetPath, writer='imagemagick_file', dpi=100)
-            plt.close(fig)
-        return True
-    except Exception:
-        return False
 
 
 if __name__ == '__main__':

@@ -1,11 +1,48 @@
 #!/usr/bin/python3
 
 from __future__ import annotations
-from typing import List
+from typing import List, Tuple
 from functools import reduce
 from util import parseChat
 from plotting_scripts.minuteBasedAccumulatedTraffic import extractMinuteBasedTraffic, extractMinuteBasedTrafficByUser, plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan
+from sys import argv
+from os import mkdir
+from os.path import abspath, dirname, exists, join
 
+def _getSinkFilePath(fileName: str, dirName: str) -> str:
+    return join(dirName, fileName)
+
+'''
+    Checks presence of sink directory on current machine,
+    if doesn't exists, it builds so.
+'''
+
+def _sinkDirBuilder(targetPath: str):
+    _tmp = dirname(abspath(targetPath))
+    if not exists(_tmp):
+        mkdir(_tmp)
+
+'''
+    Displays a simple banner, depicting usage of script,
+    along with author name & repository address
+'''
+
+def _displayBanner():
+    print('\x1b[1;6;36;49m[+]tgnize v0.1.0 - How about another Telegram Chat Analyzer ?\x1b[0m\n\n\t\x1b[3;30;47m$ tgnize `path-to-exported-chat-dir` `path-to-sink-dir`\x1b[0m\n\n[+]Author: Anjan Roy<anjanroy@yandex.com>\n[+]Source: https://github.com/itzmeanjan/tgnize ( MIT Licensed )\n')
+
+'''
+    Retuns source directory path ( holding exported telegram chat data set ) &
+    sink directory ( where we'll store generated plots )
+'''
+
+def _handleCMDInput() -> Tuple[str, str]:
+    return tuple(argv[1:len(argv)]) if len(argv) == 3 else (None, None)
+
+'''
+    Escapes troublesome special characters present in chat participant's
+    names, which might cause some issue, if we put it in generated plots ( animated )
+    name
+'''
 
 def _getEscapedName(proposedName: str) -> str:
     return proposedName.translate(
@@ -17,6 +54,10 @@ def _getEscapedName(proposedName: str) -> str:
         )
     )
 
+'''
+    Calculates rate of success of execution of this script on
+    exported chat data
+'''
 
 def __calculateSuccess__(data: List[bool]) -> float:
     return reduce(lambda acc, cur: (acc + 1) if cur else acc, data, 0) / len(data) * 100
@@ -28,39 +69,49 @@ def __calculateSuccess__(data: List[bool]) -> float:
 
 
 def main() -> float:
-    # a reusable reference, which will be used, over lifetime of this script,
-    chat = parseChat()
-    # holding full chat, under consideration
     _result = []
-    _result.append(
-        plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
-            extractMinuteBasedTraffic(chat),
-            'Accumulated Chat Traffic by Minute',
-            './plots/accumulatedChatTrafficByMinute.gif'
-        )
-    )
-    for i in chat.getTopXParticipants(5):
+    try:
+        source, sink = _handleCMDInput()
+        if not source or not sink or not exists(source):
+            _displayBanner()
+            raise Exception('Improper Invocation of `tgnize`')
+        _sinkDirBuilder(sink)
+        print('\x1b[1;6;36;49m[+]tgnize v0.1.0 - How about another Telegram Chat Analyzer ?\x1b[0m\n[*]Working ...')
+        # a reusable reference, which will be used, over lifetime of this script,
+        chat = parseChat(source)
+        # holding full chat, currently under consideration
         _result.append(
             plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
-                extractMinuteBasedTrafficByUser(chat, i),
-                'Accumulated Chat Traffic by Minute for {}'.format(i),
-                './plots/accumulatedChatTrafficByMinuteFor{}.gif'.format(
-                    _getEscapedName(i))
+                extractMinuteBasedTraffic(chat),
+                'Accumulated Chat Traffic by Minute',
+                _getSinkFilePath(sink, 'accumulatedChatTrafficByMinute.gif')
             )
         )
-    '''
-    for i in chat.users:
-        _result.append(
-            plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
-                extractMinuteBasedTrafficByUser(chat, i.name),
-                'Accumulated Chat Traffic by Minute for {}'.format(
-                    i.name[:8] + '...' if len(i.name) > 10 else i.name),
-                './plots/accumulatedChatTrafficByMinuteFor{}.gif'.format(
-                    _getEscapedName(i.name))
+        for i in chat.getTopXParticipants(5):
+            _result.append(
+                plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
+                    extractMinuteBasedTrafficByUser(chat, i),
+                    'Accumulated Chat Traffic by Minute for {}'.format(i),
+                    _getSinkFilePath(sink, './plots/accumulatedChatTrafficByMinuteFor{}.gif'.format(
+                    _getEscapedName(i)))
+                )
             )
-        )
-    '''
-    return __calculateSuccess__(_result)
+        '''
+        for i in chat.users:
+            _result.append(
+                plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
+                    extractMinuteBasedTrafficByUser(chat, i.name),
+                    'Accumulated Chat Traffic by Minute for {}'.format(
+                        i.name[:8] + '...' if len(i.name) > 10 else i.name),
+                    './plots/accumulatedChatTrafficByMinuteFor{}.gif'.format(
+                        _getEscapedName(i.name))
+                )
+            )
+        '''
+    except Exception as e:
+        print('[!]Error : {}'.format(e))
+    finally:
+        return __calculateSuccess__(_result)
 
 
 if __name__ == '__main__':

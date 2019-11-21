@@ -12,24 +12,25 @@ For whole chat _( Devs Chat telegram group )_
 
 - Time to do same for top **X** participants of Chat. I've already run this script on our test data _( exported chat of Devs Chat telegram group )_, and the results are pretty interesting.
 
-- Here I present, top 5 chat participant's _( of Devs Chat telegram group )_ accumulated chat patterns _( with minute level details )_
+- Here I present, top 5 chat participant's _( of Devs Chat telegram group )_ accumulated chat patterns _( with minute level details )_. **But for privacy reasons I'm hiding their names, so that they can't be traced back.**
 
-For _Deleted Account_ _( this account holder deleted their account )_
+
+Anonymous Participant 1's
 
 ![accumulatedChatTrafficByMinuteForDeleted_Account](../plots/accumulatedChatTrafficByMinuteForDeleted_Account.gif)
 
-For _Spark_
+Anonymous Participant 2's
 
 ![accumulatedChatTrafficByMinuteForSpark](../plots/accumulatedChatTrafficByMinuteForSpark.gif)
 
-For _Pizza Rolls_
+Anonymous Participant 3's
 
 ![accumulatedChatTrafficByMinuteForPizza_Rolls](../plots/accumulatedChatTrafficByMinuteForPizza_Rolls.gif)
 
-For _Thomas_
+Anonymous Participant 4's
 
 ![accumulatedChatTrafficByMinuteForThomas](../plots/accumulatedChatTrafficByMinuteForThomas.gif)
 
-For _⟨ Simon | Schürrle ⟩_
+Anonymous Participant 5's
 
 ![accumulatedChatTrafficByMinuteFor⟨_Simon_|_Schürrle_⟩](../plots/accumulatedChatTrafficByMinuteFor⟨_Simon_|_Schürrle_⟩.gif)
