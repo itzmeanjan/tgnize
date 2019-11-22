@@ -11,7 +11,7 @@ from itertools import chain
 
 
 class User:
-    def __init__(self, name: str, messageIDs: List[int] = [], viaBot: Dict[str, List[int]] = {}):
+    def __init__(self, name: str, messageIDs: List[int], viaBot: Dict[str, List[int]]):
         self.name = name
         self.messageIDs = messageIDs
         self.viaBotMessages = viaBot

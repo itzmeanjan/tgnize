@@ -31,34 +31,36 @@ def handleMessage(tag: Tag, chat: Chat, prev_tag: Tag = None):
         txt = tag.find('div', attrs={'class': 'text'})
         reply_to = tag.find(
             'div', attrs={'class': 'reply_to_details'})
+        fromUser = tag.find('div', attrs={
+            'class': 'from_name'}).getText().strip()
         chat.push(
             Message(
                 int(tag.get('id').replace('message', '')),
-                tag.find('div', attrs={
-                    'class': 'from_name'}).getText().strip(),
+                chat.extractUserAndBotNameFromMessage(fromUser) if chat.isAViaBotMessage(fromUser) else (fromUser, None),
                 txt.getText().strip() if txt else None,
                 tag.find('div', attrs={'class': 'pull_right date details'}).get(
                     'title'),
-                reply_to.a.get('href') if reply_to else None
+                int(reply_to.a.get('href')) if reply_to else None
             )
         )
-        chat.updateUserRecords(tag.find('div', attrs={
-            'class': 'from_name'}).getText().strip(),
+        chat.updateUserRecords(
+            fromUser,
             int(tag.get('id').replace('message', '')))
     else:
         txt = prev_tag.find('div', attrs={'class': 'text'})
+        fromUser = prev_tag.find('div', attrs={
+            'class': 'from_name'}).getText().strip()
         chat.push(
             Message(
                 int(tag.get('id').replace('message', '')),
-                prev_tag.find('div', attrs={
-                    'class': 'from_name'}).getText().strip(),
+                chat.extractUserAndBotNameFromMessage(fromUser) if chat.isAViaBotMessage(fromUser) else (fromUser, None),
                 txt.getText().strip() if txt else None,
                 tag.find('div', attrs={'class': 'pull_right date details'}).get(
                     'title')
             )
         )
-        chat.updateUserRecords(prev_tag.find('div', attrs={
-            'class': 'from_name'}).getText().strip(),
+        chat.updateUserRecords(
+            fromUser,
             int(tag.get('id').replace('message', '')))
 
 

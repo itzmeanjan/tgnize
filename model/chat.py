@@ -263,12 +263,11 @@ class Chat:
     '''
 
     def updateUserRecords(self, user: str, messageID: int):
-        _tmp = None
         if self.isAViaBotMessage(user):
             userName, botName = self.extractUserAndBotNameFromMessage(user)
             _tmp = self.getUser(userName)
             if not _tmp:
-                _tmpUser = User(userName)
+                _tmpUser = User(userName, [], {})
                 _tmpUser.updateViaBotMessages(botName, messageID)
                 self.pushUser(_tmpUser)
             else:
@@ -276,9 +275,14 @@ class Chat:
         else:
             _tmp = self.getUser(user)
             if not _tmp:
-                self.pushUser(User(user, [messageID]))
+                self.pushUser(User(user, [messageID], {}))
             else:
                 _tmp.messageIDs.append(messageID)
+
+    '''
+        Get Top X chat contributors name list,
+        in terms of #-of messages sent by them in Chat
+    '''
 
     def getTopXParticipants(self, x: int) -> List[str]:
         def _findReplacableCandidate(current: int) -> str:
@@ -295,7 +299,7 @@ class Chat:
                 if _candidate:
                     _tmp.pop(_candidate)
                     _tmp[i.name] = i.totalMessageCount
-        return [i for i in _tmp.keys()]
+        return sorted(_tmp, key = lambda e: _tmp[e], reverse = True)
 
 
 if __name__ == '__main__':

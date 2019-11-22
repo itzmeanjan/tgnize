@@ -7,10 +7,16 @@ from util import parseChat
 from plotting_scripts.minuteBasedAccumulatedTraffic import extractMinuteBasedTraffic, extractMinuteBasedTrafficByUser, plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan
 from sys import argv
 from os import mkdir
-from os.path import abspath, dirname, exists, join
+from os.path import abspath, exists, join
 
-def _getSinkFilePath(fileName: str, dirName: str) -> str:
-    return join(dirName, fileName)
+'''
+    Given sink directory path and target file name,
+    it joins them into a single component & returns
+    sink file path ( absolute )
+'''
+
+def _getSinkFilePath(dirName: str, fileName: str) -> str:
+    return join(abspath(dirName), fileName)
 
 '''
     Checks presence of sink directory on current machine,
@@ -18,7 +24,7 @@ def _getSinkFilePath(fileName: str, dirName: str) -> str:
 '''
 
 def _sinkDirBuilder(targetPath: str):
-    _tmp = dirname(abspath(targetPath))
+    _tmp = abspath(targetPath)
     if not exists(_tmp):
         mkdir(_tmp)
 
@@ -92,7 +98,7 @@ def main() -> float:
                 plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
                     extractMinuteBasedTrafficByUser(chat, i),
                     'Accumulated Chat Traffic by Minute for {}'.format(i),
-                    _getSinkFilePath(sink, './plots/accumulatedChatTrafficByMinuteFor{}.gif'.format(
+                    _getSinkFilePath(sink, 'accumulatedChatTrafficByMinuteFor{}.gif'.format(
                     _getEscapedName(i)))
                 )
             )

@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
 from __future__ import annotations
+from typing import Tuple
 from datetime import datetime, time
 from activity import Activity
 from math import ceil
 
 '''
-    This class is designed to hold 
+    This class is designed to hold
     record of a certain message sent by
     some chat participant
 
@@ -19,9 +20,9 @@ from math import ceil
 
 
 class Message(Activity):
-    def __init__(self, idx: int, user: str, content: str, timestamp: str, replyTo: int = None):
+    def __init__(self, idx: int, user: Tuple[str, str], content: str, timestamp: str, replyTo: int = None):
         super().__init__(idx)
-        self.user = user
+        self.user, self.botName = user
         self.content = content
         self.timestamp = timestamp
         self.replyTo = replyTo
