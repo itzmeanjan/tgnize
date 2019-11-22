@@ -34,7 +34,7 @@ def _sinkDirBuilder(targetPath: str):
 '''
 
 def _displayBanner():
-    print('\x1b[1;6;36;49m[+]tgnize v0.1.0 - How about another Telegram Chat Analyzer ?\x1b[0m\n\n\t\x1b[3;30;47m$ tgnize `path-to-exported-chat-dir` `path-to-sink-dir`\x1b[0m\n\n[+]Author: Anjan Roy<anjanroy@yandex.com>\n[+]Source: https://github.com/itzmeanjan/tgnize ( MIT Licensed )\n')
+    print('\x1b[1;6;36;49m[+]tgnize v0.1.1 - How about another Telegram Chat Analyzer ?\x1b[0m\n\n\t\x1b[3;30;47m$ tgnize `path-to-exported-chat-dir` `path-to-sink-dir`\x1b[0m\n\n[+]Author: Anjan Roy<anjanroy@yandex.com>\n[+]Source: https://github.com/itzmeanjan/tgnize ( MIT Licensed )\n')
 
 '''
     Retuns source directory path ( holding exported telegram chat data set ) &
@@ -82,7 +82,7 @@ def main() -> float:
             _displayBanner()
             raise Exception('Improper Invocation of `tgnize`')
         _sinkDirBuilder(sink)
-        print('\x1b[1;6;36;49m[+]tgnize v0.1.0 - How about another Telegram Chat Analyzer ?\x1b[0m\n[*]Working ...')
+        print('\x1b[1;6;36;49m[+]tgnize v0.1.1 - How about another Telegram Chat Analyzer ?\x1b[0m\n[*]Working ...')
         # a reusable reference, which will be used, over lifetime of this script,
         chat = parseChat(source)
         # holding full chat, currently under consideration

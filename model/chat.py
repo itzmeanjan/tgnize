@@ -275,9 +275,11 @@ class Chat:
         else:
             _tmp = self.getUser(user)
             if not _tmp:
-                self.pushUser(User(user, [messageID], {}))
+                _tmpUser = User(user, [], {})
+                _tmpUser.pushMessageId(messageID)
+                self.pushUser(_tmpUser)
             else:
-                _tmp.messageIDs.append(messageID)
+                _tmp.pushMessageId(messageID)
 
     '''
         Get Top X chat contributors name list,
@@ -300,6 +302,12 @@ class Chat:
                     _tmp.pop(_candidate)
                     _tmp[i.name] = i.totalMessageCount
         return sorted(_tmp, key = lambda e: _tmp[e], reverse = True)
+
+    def getUsersWhoUsedBot(self) -> List[str]:
+        return [i.name for i in filter(lambda e: e.sentAnyMessageViaBot, self.users)]
+
+    def getUsersWhoDidNotUseBot(self) -> List[str]:
+        return [i.name for i in filter(lambda e: not e.sentAnyMessageViaBot, self.users)]
 
 
 if __name__ == '__main__':
