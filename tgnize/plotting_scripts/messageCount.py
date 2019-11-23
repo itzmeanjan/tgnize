@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
 from __future__ import annotations
-from model.chat import Chat
 from typing import Dict
+
+from ..model.chat import Chat
+
 
 '''
     Returns a mapping of all those Users

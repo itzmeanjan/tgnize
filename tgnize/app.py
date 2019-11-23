@@ -3,11 +3,17 @@
 from __future__ import annotations
 from typing import List, Tuple
 from functools import reduce
-from util import parseChat
-from plotting_scripts.minuteBasedAccumulatedTraffic import extractMinuteBasedTraffic, extractMinuteBasedTrafficByUser, plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan
 from sys import argv
 from os import mkdir
 from os.path import abspath, exists, join
+
+from .util import parseChat
+from .plotting_scripts.minuteBasedAccumulatedTraffic import (
+    extractMinuteBasedTraffic,
+    extractMinuteBasedTrafficByUser,
+    plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan
+)
+
 
 '''
     Given sink directory path and target file name,

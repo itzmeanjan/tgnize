@@ -4,17 +4,19 @@ from __future__ import annotations
 from os import listdir
 from os.path import join, abspath
 from typing import List, Tuple
-from model.chat import Chat
-from model.message import Message
-from model.event import Event
 from re import compile as reg_compile
 from time import time
+
 try:
     from bs4 import BeautifulSoup
     from bs4.element import Tag
 except ImportError as e:
     print('[!]Module Unavailable : {}'.format(str(e)))
     exit(1)
+
+from .model.chat import Chat
+from .model.message import Message
+from .model.event import Event
 
 
 def handleEvent(tag: Tag, chat: Chat):
