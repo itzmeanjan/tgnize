@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
 from __future__ import annotations
-from typing import List
+from typing import List, Tuple
 from activity import Activity
 from user import User
 from re import compile as reg_compile
 from functools import reduce
+from datetime import datetime, timedelta
 
 
 class Chat:
@@ -287,27 +288,81 @@ class Chat:
     '''
 
     def getTopXParticipants(self, x: int) -> List[str]:
-        def _findReplacableCandidate(current: int) -> str:
-            _candidates = sorted(reduce(lambda acc, cur: acc + [cur] if _tmp[cur] <= current else acc, _tmp, []))
-            return None if not _candidates else _candidates[-1]
+        return [i.name for i in sorted(self.users, key=lambda e: e.totalMessageCount, reverse=True)[:x]]
 
-        x = 1 if x <= 0 else x
-        _tmp = {}
-        for i in self.users:
-            if len(_tmp) < x:
-                _tmp[i.name] = i.totalMessageCount
-            else:
-                _candidate = _findReplacableCandidate(i.totalMessageCount)
-                if _candidate:
-                    _tmp.pop(_candidate)
-                    _tmp[i.name] = i.totalMessageCount
-        return sorted(_tmp, key = lambda e: _tmp[e], reverse = True)
+    '''
+        Get a list of those users who
+        ever sent any message via bot
+        to this Chat
+    '''
 
     def getUsersWhoUsedBot(self) -> List[str]:
         return [i.name for i in filter(lambda e: e.sentAnyMessageViaBot, self.users)]
 
+    '''
+        Returns count of those users who
+        sent any message to this Chat via bot
+    '''
+
+    def getUserCountWhoUsedBot(self) -> int:
+        return len(self.getUsersWhoUsedBot())
+
+    '''
+        Returns a list of those users who
+        never sent any message via bot to this Chat
+    '''
+
     def getUsersWhoDidNotUseBot(self) -> List[str]:
         return [i.name for i in filter(lambda e: not e.sentAnyMessageViaBot, self.users)]
+
+    '''
+        Returns count of aforementioned kind of users
+    '''
+
+    def getUserCountWhoDidNotUseBot(self) -> int:
+        return len(self.getUsersWhoDidNotUseBot())
+
+    @property
+    def _findFirstMessage(self) -> Message:
+        _tmp = None
+        for i in self.activities:
+            if not self.isEvent(i.index):
+                _tmp = i
+                break
+        return _tmp
+
+    @property
+    def _findLastMessage(self) -> Message:
+        _tmp = None
+        for i in range(self.activityCount - 1, -1, -1):
+            if not self.isEvent(self.activities[i].index):
+                _tmp = self.activities[i]
+                break
+        return _tmp
+
+    def getChatTimeRange(self) -> Tuple[datetime, datetime]:
+        return self._findFirstMessage.getDateTime, self._findLastMessage.getDateTime
+
+    def findActivitiesWithInTimeRange(self, timeRange: Tuple[datetime, datetime]) -> List[int]:
+        _tmp = []
+        for i in self.activities:
+            if not self.isEvent(i.index):
+                if timeRange[0] <= i.getDateTime <= timeRange[1]:
+                    _tmp.append(i.index)
+                if i.getDateTime > timeRange[1]:
+                    break
+        return _tmp
+
+    def splitTimeRangeWithGap(self, timeRange: Tuple[datetime, datetime], gap: timedelta) -> List[Tuple[datetime, datetime]]:
+        _tmp = []
+        _a = timeRange[0]
+        _b = _a + gap
+        while(_b < timeRange[1]):
+            _tmp.append((_a, _b))
+            _a = _b + timedelta(seconds = 1)
+            _b = _a + gap
+        _tmp.append((_a, timeRange[1]))
+        return _tmp
 
 
 if __name__ == '__main__':
