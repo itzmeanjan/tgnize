@@ -118,7 +118,8 @@ $ tgnize
 
 **This project is in its infancy, a lot of features to be added. If you've something in your mind, don't hesitate to create an issue or make a PR**
 
-- [x] [Depiction of Accumulated Chat Traffic _( for whole Chat along with top **X** chat participants )_](./docs/minuteBasedAccumulatedTraffic.md)
+- [x] [Depiction of Accumulated Chat Traffic _( for whole Chat along with top **'X'** chat participants )_ with minute level details](./docs/minuteBasedAccumulatedTraffic.md)
+- [x] [Top **'X'** Active Chat Participant(s) Over Time](./docs/topXActiveChatParticipantsOverTime.gif)
 - [ ] Contribution of Chat Participants to Chat
 - [ ] Overall Activity of Chat _( for a specified period of time )_
 - [ ] Emoji Analysis
