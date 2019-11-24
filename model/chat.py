@@ -343,16 +343,6 @@ class Chat:
     def getChatTimeRange(self) -> Tuple[datetime, datetime]:
         return self._findFirstMessage.getDateTime, self._findLastMessage.getDateTime
 
-    def findActivitiesWithInTimeRange(self, timeRange: Tuple[datetime, datetime]) -> List[int]:
-        _tmp = []
-        for i in self.activities:
-            if not self.isEvent(i.index):
-                if timeRange[0] <= i.getDateTime <= timeRange[1]:
-                    _tmp.append(i.index)
-                if i.getDateTime > timeRange[1]:
-                    break
-        return _tmp
-
     def splitTimeRangeWithGap(self, timeRange: Tuple[datetime, datetime], gap: timedelta) -> List[Tuple[datetime, datetime]]:
         _tmp = []
         _a = timeRange[0]
@@ -362,6 +352,16 @@ class Chat:
             _a = _b + timedelta(seconds = 1)
             _b = _a + gap
         _tmp.append((_a, timeRange[1]))
+        return _tmp
+
+    def findActivitiesWithInTimeRange(self, timeRange: Tuple[datetime, datetime]) -> List[int]:
+        _tmp = []
+        for i in self.activities:
+            if not self.isEvent(i.index):
+                if timeRange[0] <= i.getDateTime <= timeRange[1]:
+                    _tmp.append(i.index)
+                if i.getDateTime > timeRange[1]:
+                    break
         return _tmp
 
 

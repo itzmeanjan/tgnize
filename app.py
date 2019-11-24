@@ -5,9 +5,11 @@ from typing import List, Tuple
 from functools import reduce
 from util import parseChat
 from plotting_scripts.minuteBasedAccumulatedTraffic import extractMinuteBasedTraffic, extractMinuteBasedTrafficByUser, plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan
+from plotting_scripts.activeParticipantsOverTime import getTopXParticipantsFromMessageRangeAlongWithContribution, plotAnimatedGraphShowingTopXActiveParticipantsOverTime
 from sys import argv
 from os import mkdir
 from os.path import abspath, exists, join
+from datetime import timedelta
 
 '''
     Given sink directory path and target file name,
@@ -102,6 +104,14 @@ def main() -> float:
                     _getEscapedName(i)))
                 )
             )
+        _result.append(
+            plotAnimatedGraphShowingTopXActiveParticipantsOverTime(
+                [('Top 5 Active Participants from {} to {}'.format(i[0].strftime('%b %d %Y, %I:%M:%S %p'), i[1].strftime('%b %d %Y, %I:%M:%S %p')), \
+                    getTopXParticipantsFromMessageRangeAlongWithContribution(5, chat, chat.findActivitiesWithInTimeRange(i))) \
+                        for i in chat.splitTimeRangeWithGap(chat.getChatTimeRange(), timedelta(days=30))],
+                _getSinkFilePath(sink, 'topXActiveChatParticipantsOverTime.gif')
+            )
+        )
         '''
         for i in chat.users:
             _result.append(
