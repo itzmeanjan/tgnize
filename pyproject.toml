@@ -19,5 +19,11 @@ description-file="README.md"
 [tool.flit.metadata.requires-extra]
 dev = ["flit"]
 
+[tool.flit.sdist]
+exclude=[
+  "plots/*",
+  "_config.yml"
+]
+
 [tool.flit.scripts]
 tgnize = "tgnize.app:main"
