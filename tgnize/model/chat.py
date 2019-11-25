@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 from typing import List, Tuple
-from activity import Activity
-from user import User
 from re import compile as reg_compile
 from functools import reduce
 from datetime import datetime, timedelta
+from .activity import Activity
+from .user import User
 
 
 class Chat:

@@ -5,13 +5,13 @@ from matplotlib import pyplot as plt
 from matplotlib import animation as anim
 from matplotlib.dates import HourLocator, MinuteLocator, DateFormatter
 from matplotlib.ticker import NullFormatter, NullLocator, MultipleLocator
-from model.chat import Chat
-from model.plotDataRange import DataRange
 from collections import Counter
 from typing import Tuple
 from datetime import datetime, date, time
 from math import ceil
 from itertools import chain
+from ..model.chat import Chat
+from ..model.plotDataRange import DataRange
 
 
 def _fillUpEmptyMinuteSlotsWithZeroTrafficDenotation(traffic: Counter) -> Counter:

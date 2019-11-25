@@ -3,8 +3,8 @@
 from __future__ import annotations
 from typing import Tuple
 from datetime import datetime, time
-from activity import Activity
 from math import ceil
+from .activity import Activity
 
 '''
     This class is designed to hold
