@@ -14,9 +14,16 @@ classifiers = [
 ]
 requires = ["matplotlib", "typing", "beautifulsoup4", "lxml"]
 requires-python=">=3.7"
+description-file="README.md"
 
 [tool.flit.metadata.requires-extra]
 dev = ["flit"]
 
 [tool.flit.scripts]
 tgnize = "tgnize.app:main"
+
+[tool.flit.sdist]
+exclude=[
+  "plots/",
+  "_config.yml"
+]
