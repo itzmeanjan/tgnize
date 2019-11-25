@@ -41,68 +41,15 @@ $ sudo snap install telegram-desktop # run on your linux terminal
 Log into your account and choose which chat to export. Well this expoting procedure can take some time, depending upon age & activeness of Chat.
 
 ## usage
-- Download this zip from [here](https://github.com/itzmeanjan/tgnize/releases)
-- Unzip it into a suitable directory on your machine
-- Get into `tgnize` directory
-
+Now you can directly install **tgnize** on your machine, using pip.
 ```shell script
-$ cd tgnize
-$ tree -h
-.
-├── [4.2K]  app.py
-├── [4.0K]  docs
-│   └── [1.8K]  minuteBasedAccumulatedTraffic.md
-├── [ 227]  install
-├── [1.0K]  LICENSE
-├── [4.0K]  model
-│   ├── [ 245]  activity.py
-│   ├── [9.8K]  chat.py
-│   ├── [ 332]  event.py
-│   ├── [ 100]  __init__.py
-│   ├── [1.3K]  message.py
-│   ├── [ 515]  plotDataRange.py
-│   └── [1.1K]  user.py
-├── [4.0K]  plotting_scripts
-│   ├── [ 100]  __init__.py
-│   ├── [ 169]  messageCount.py
-│   └── [ 11K]  minuteBasedAccumulatedTraffic.py
-├── [2.7K]  README.md
-├── [  56]  requirements.txt
-├── [  47]  tgnize
-└── [4.4K]  util.py
-
-3 directories, 18 files
+$ pip3 install tgnize --user # make sure you've pip installed
 ```
-- Make sure you've `python3-pip` installed, which will be required for installing python modules ( i.e. beautifulsoup4, matplotlib etc. )
-- Run `install` script ( BASH script ), which will download all required dependencies into your machine
-
-```shell script
-$ ./install
-```
-- For generating animated plots, you'll need to have `imagemagick` installed on your machine. Install it using your system package manager.
-
-```shell script
-$ sudo apt-get install imagemagick # for debian based distros
-$ sudo dnf install imagemagick # for fedora
-```
-- Now you need to add installation path of `tgnize`, into your **PATH** variable
-
-```shell script
-$ pwd # copy it
-```
-- If you're on BASH, find `.bashrc` under your home directory, if not found create a file with that name
-- Add follwing line at end of that file, while replacing `paste-here` section with installation path of `tgnize`
-
-```shell script
-export PATH="$PATH:paste-here"
-```
-- Now close this terminal window & open a new one
-- You'll have `tgnize`, executable BASH script present under downloaded zip, on your path. Simply invoke `tgnize` directly, to be sure things are working as they're supposed to be
-
-```shell script
-$ cd # get to home directory
+Using **tgnize** is easy too, just pass path to directory, where you've exported Telegram Chat & sink directory path _( where generated plots to be stored )_
+```console
+$ cd # at $HOME now
 $ tgnize
-[+]tgnize v0.1.0 - How about another Telegram Chat Analyzer ?
+[+]tgnize v0.1.3 - How about another Telegram Chat Analyzer ?
 
 	$ tgnize `path-to-exported-chat-dir` `path-to-sink-dir`
 
@@ -110,9 +57,8 @@ $ tgnize
 [+]Source: https://github.com/itzmeanjan/tgnize ( MIT Licensed )
 
 [!]Error : Improper Invocation of `tgnize`
+[+]Success : 0.00 %
 ```
-- It's asking you to properly invoke script, by giving source directory _( holding exported telegram chat, of a single Chat, may be a lot of files in case of large Chats )_ & sink directory _( will hold generated plots / charts )_
-- If you've already exported some Telegram chat, consider invoking this script, to understand how you spent your time in Chat
 
 ## progress
 
