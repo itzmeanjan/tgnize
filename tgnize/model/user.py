@@ -17,6 +17,10 @@ class User:
         self.viaBotMessages = viaBot
 
     @property
+    def messageIDs(self) -> List[int]:
+        return self._messageIDs
+
+    @property
     def messageCount(self) -> int:
         return len(self._messageIDs)
 

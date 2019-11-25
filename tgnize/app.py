@@ -76,7 +76,10 @@ def _getEscapedName(proposedName: str) -> str:
 '''
 
 def __calculateSuccess__(data: List[bool]) -> float:
-    return reduce(lambda acc, cur: (acc + 1) if cur else acc, data, 0) / len(data) * 100
+    try:
+        return reduce(lambda acc, cur: (acc + 1) if cur else acc, data, 0) / len(data) * 100
+    except Exception:
+        return 0.0 # for safety, if we get a empty list as input, it'll raise DivisionByZero error, which will be caught
 
 
 '''
