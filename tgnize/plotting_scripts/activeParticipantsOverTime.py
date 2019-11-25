@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from __future__ import annotations
-from model.chat import Chat
+from ..model.chat import Chat
 from typing import Dict
 from matplotlib import pyplot as plt
 from matplotlib import animation as anim

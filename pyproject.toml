@@ -1,0 +1,17 @@
+[build-system]
+requires = ["flit_core >=2,<3"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "tgnize"
+author = "Anjan Roy"
+author-email = "anjanroy@yandex.com"
+home-page = "https://itzmeanjan.github.io/tgnize/"
+classifiers = ["License :: OSI Approved :: MIT License"]
+requires = ["matplotlib", "typing", "beautifulsoup4", "lxml"]
+
+[tool.flit.metadata.requires-extra]
+dev = ["flit"]
+
+[tool.flit.scripts]
+tgnize = "tgnize.app:main"

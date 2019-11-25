@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from __future__ import annotations
-from activity import Activity
+from .activity import Activity
 
 
 class Event(Activity):
