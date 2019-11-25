@@ -44,7 +44,7 @@ def _sinkDirBuilder(targetPath: str):
 '''
 
 def _displayBanner():
-    print('\x1b[1;6;36;49m[+]tgnize v0.1.1 - How about another Telegram Chat Analyzer ?\x1b[0m\n\n\t\x1b[3;30;47m$ tgnize `path-to-exported-chat-dir` `path-to-sink-dir`\x1b[0m\n\n[+]Author: Anjan Roy<anjanroy@yandex.com>\n[+]Source: https://github.com/itzmeanjan/tgnize ( MIT Licensed )\n')
+    print('\x1b[1;6;36;49m[+]tgnize v0.1.3 - How about another Telegram Chat Analyzer ?\x1b[0m\n\n\t\x1b[3;30;47m$ tgnize `path-to-exported-chat-dir` `path-to-sink-dir`\x1b[0m\n\n[+]Author: Anjan Roy<anjanroy@yandex.com>\n[+]Source: https://github.com/itzmeanjan/tgnize ( MIT Licensed )\n')
 
 '''
     Retuns source directory path ( holding exported telegram chat data set ) &
@@ -76,10 +76,7 @@ def _getEscapedName(proposedName: str) -> str:
 '''
 
 def __calculateSuccess__(data: List[bool]) -> float:
-    try:
-        return reduce(lambda acc, cur: (acc + 1) if cur else acc, data, 0) / len(data) * 100
-    except Exception:
-        return 0.0 # for safety, if we get a empty list as input, it'll raise DivisionByZero error, which will be caught
+    return 0.0 if not data else reduce(lambda acc, cur: (acc + 1) if cur else acc, data, 0) / len(data) * 100
 
 
 '''
@@ -95,7 +92,7 @@ def main() -> float:
             _displayBanner()
             raise Exception('Improper Invocation of `tgnize`')
         _sinkDirBuilder(sink)
-        print('\x1b[1;6;36;49m[+]tgnize v0.1.1 - How about another Telegram Chat Analyzer ?\x1b[0m\n[*]Working ...')
+        print('\x1b[1;6;36;49m[+]tgnize v0.1.3 - How about another Telegram Chat Analyzer ?\x1b[0m\n[*]Working ...')
         # a reusable reference, which will be used, over lifetime of this script,
         chat = parseChat(source)
         # holding full chat, currently under consideration
@@ -138,12 +135,12 @@ def main() -> float:
     except Exception as e:
         print('[!]Error : {}'.format(e))
     finally:
-        return __calculateSuccess__(_result)
+        print('[+]Success : {:.2f} %'.format(__calculateSuccess__(_result)))
 
 
 if __name__ == '__main__':
     try:
-        print('[+]Success : {:.2f} %'.format(main()))
+        main()
     except KeyboardInterrupt:
         print('\n[!]Terminated')
     finally:
