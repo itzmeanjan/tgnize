@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import List, Tuple
 from functools import reduce
+from subprocess import run
 from sys import argv
 from os import mkdir
 from os.path import abspath, exists, join
@@ -78,6 +79,31 @@ def _getEscapedName(proposedName: str) -> str:
 def __calculateSuccess__(data: List[bool]) -> float:
     return 0.0 if not data else reduce(lambda acc, cur: (acc + 1) if cur else acc, data, 0) / len(data) * 100
 
+def _choiceHandler(ch: int, chat: Chat):
+    if ch == -1 or ch == 5:
+        print('\n[!]Terminated')
+        exit(0)
+    elif ch == 0:
+        print('\n\x1b[5;31;49m[!]Invalid choice\x1b[0m')
+    elif ch == 1:
+        print('\n\x1b[1;31;49m{}\x1b[0m participants in Chat'.format(chat.userCount))
+    elif ch == 2:
+        print('\n\x1b[1;31;49m{}\x1b[0m messages in Chat'.format(chat.totalMessageCount))
+    elif ch == 3:
+        print('\n\x1b[1;31;49m{}\x1b[0m events in Chat'.format(chat.totalEventCount))
+    elif ch == 4:
+        print('\n\x1b[1;31;49m{}\x1b[0m activities in Chat ( in total )'.format(chat.activityCount))
+    else:
+        print('\n\x1b[1;6;36;49m\_(^-^)_/\x1b[0m')
+
+def _menu() -> int:
+    try:
+        print("\n\t1 > Get Chat Participant Count\n\t2 > Get Message Count in Chat\n\t3 > Get Event Count in Chat\n\t4 > Get Total Activity Count in Chat\n\t4 > Get Top `X` Chat Participant(s)\n\t5 > Exit\n\n\x1b[1;1;32;50mtgnize >> \x1b[0m", end="")
+        return int(input())
+    except EOFError:
+        return -1
+    except Exception:
+        return 0
 
 '''
     Main entry point of script
@@ -85,6 +111,7 @@ def __calculateSuccess__(data: List[bool]) -> float:
 
 
 def main() -> float:
+    run('clear')
     _result = []
     try:
         source, sink = _handleCMDInput()
@@ -92,10 +119,14 @@ def main() -> float:
             _displayBanner()
             raise Exception('Improper Invocation of `tgnize`')
         _sinkDirBuilder(sink)
-        print('\x1b[1;6;36;49m[+]tgnize v0.1.3 - How about another Telegram Chat Analyzer ?\x1b[0m\n[*]Working ...')
+        _displayBanner()
+        print('[*]Preparing ...')
         # a reusable reference, which will be used, over lifetime of this script,
         chat = parseChat(source)
         # holding full chat, currently under consideration
+        while(1):
+            _choiceHandler(_menu(), chat)
+        '''
         _result.append(
             plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
                 extractMinuteBasedTraffic(chat),
@@ -121,6 +152,7 @@ def main() -> float:
             )
         )
         '''
+        '''
         for i in chat.users:
             _result.append(
                 plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(
@@ -132,10 +164,14 @@ def main() -> float:
                 )
             )
         '''
+    except KeyboardInterrupt:
+        print('[!]Terminated')
     except Exception as e:
-        print('[!]Error : {}'.format(e))
+        print('[!]{}'.format(e))
+    '''
     finally:
         print('[+]Success : {:.2f} %'.format(__calculateSuccess__(_result)))
+    '''
 
 
 if __name__ == '__main__':
