@@ -45,10 +45,12 @@ Now you can directly install **tgnize** on your machine, using pip.
 ```shell script
 $ pip3 install tgnize --user # make sure you've pip installed
 ```
+[![asciicast](https://asciinema.org/a/zAm8En7JtEdft6qllfdTxfCys.svg)](https://asciinema.org/a/zAm8En7JtEdft6qllfdTxfCys)
+
 Using **tgnize** is easy too, just pass path to directory, where you've exported Telegram Chat & sink directory path _( where generated plots to be stored )_
-```console
+```bash
 $ cd # at $HOME now
-$ tgnize
+$ tgnize /path-to-exported-chat /sink-dir
 [+]tgnize v0.1.3 - How about another Telegram Chat Analyzer ?
 
 	$ tgnize `path-to-exported-chat-dir` `path-to-sink-dir`
@@ -56,8 +58,19 @@ $ tgnize
 [+]Author: Anjan Roy<anjanroy@yandex.com>
 [+]Source: https://github.com/itzmeanjan/tgnize ( MIT Licensed )
 
-[!]Error : Improper Invocation of `tgnize`
-[+]Success : 0.00 %
+[*]Preparing ...
+
+[+]Options ::
+
+	1 > Get Chat Participant Count
+	2 > Get Message Count in Chat
+	3 > Get Event Count in Chat
+	4 > Get Total Activity Count in Chat
+	5 > Get Top `X` Chat Participant(s)
+	6 > Exit
+
+tgnize >>
+
 ```
 
 ## progress
