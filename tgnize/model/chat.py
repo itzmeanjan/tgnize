@@ -364,6 +364,30 @@ class Chat:
                     break
         return _tmp
 
+    '''
+        Returns a 3 element tuple, indicating minimum delay,
+        maximum delay & average delay between two messages,
+        sent one immediately after another, while considering those
+        messages only sent within given time range.
+    '''
+
+    def delayInMessagesWithInTimeRange(self, timeRange: Tuple[datetime, datetime]) -> Tuple(timedelta, timedelta, timedelta):
+        _tmp = self.findActivitiesWithInTimeRange(timeRange)
+        _tot = timedelta()
+        _maxDelay = self.getActivity(_tmp[1]).getDateTime - self.getActivity(_tmp[0]).getDateTime
+        _minDelay = _maxDelay
+        for i, j in enumerate(_tmp):
+            try:
+                _cur = (self.getActivity(_tmp[i + 1]).getDateTime - self.getActivity(j).getDateTime)
+                _tot += _cur
+                if _maxDelay < _cur:
+                    _maxDelay = _cur
+                if _minDelay > _cur:
+                    _minDelay = _cur
+            except IndexError:
+                pass
+        return _minDelay, _maxDelay, _tot / (len(_tmp) - 1)
+
 
 if __name__ == '__main__':
     print('[!]This module is expected to be used as a backend handler')

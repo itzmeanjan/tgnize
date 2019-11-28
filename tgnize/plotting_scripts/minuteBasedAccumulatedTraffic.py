@@ -51,22 +51,21 @@ def _fillUpEmptyMinuteSlotsWithZeroTrafficDenotation(traffic: Counter) -> Counte
 '''
 
 
-def extractMinuteBasedTraffic(chat: Chat) -> Counter:
-    return _fillUpEmptyMinuteSlotsWithZeroTrafficDenotation(
-        Counter(
-            map(lambda e:
-                datetime.combine(date(2000, 1, 1),
-                    e.getTime.replace(minute=(
-                    e.getTime.minute + 1) if e.getTime.minute < 59 else e.getTime.minute, second=0)
-                if e.getTime.second >= 30
-                else e.getTime.replace(second=0)),
-                filter(lambda e:
-                       not chat.isEvent(e.index),
-                       chat.activities
-                       )
-                )
-        )
+def extractMinuteBasedTraffic(chat: Chat, _fillUpEmptyMinutes = True) -> Counter:
+    _tmp = Counter(
+        map(lambda e:
+            datetime.combine(date(2000, 1, 1),
+                e.getTime.replace(minute=(
+                e.getTime.minute + 1) if e.getTime.minute < 59 else e.getTime.minute, second=0)
+            if e.getTime.second >= 30
+            else e.getTime.replace(second=0)),
+            filter(lambda e:
+                   not chat.isEvent(e.index),
+                   chat.activities
+                   )
+            )
     )
+    return _fillUpEmptyMinuteSlotsWithZeroTrafficDenotation(_tmp) if _fillUpEmptyMinutes else _tmp
 
 
 '''
@@ -151,30 +150,39 @@ def plotAnimatedGraphForAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, t
     indicated by 0 or 1 or 2 or 3
 '''
 
-'''
-def determineHalveOfDay(tm: time) -> int:
+def _determineHalveOfDay(tm: datetime) -> int:
+    _tm = tm.time()
     return 0 \
-        if tm >= time(0, 0) and tm <= time(5, 59) else 1 \
-        if tm >= time(6, 0) and tm <= time(11, 59) else 2 \
-        if tm >= time(12, 0) and tm <= time(17, 59) else 3
-'''
+        if _tm >= time(0, 0) and _tm <= time(5, 59) else 1 \
+        if _tm >= time(6, 0) and _tm <= time(11, 59) else 2 \
+        if _tm >= time(12, 0) and _tm <= time(17, 59) else 3
 
-'''
 def splitMinuteBasedTrafficIntoFourParts(traffic: Counter) -> Tuple[Counter]:
     first, second, third, fourth = Counter(
         []), Counter([]), Counter([]), Counter([])
     for i, j in traffic.items():
-        _tmp = determineHalveOfDay(i)
+        _tmp = _determineHalveOfDay(i)
         if _tmp == 0:
-            first[datetime.combine(date(2000, 1, 1), i)] = j
+            first[i] = j
         elif _tmp == 1:
-            second[datetime.combine(date(2000, 1, 1), i)] = j
+            second[i] = j
         elif _tmp == 2:
-            third[datetime.combine(date(2000, 1, 1), i)] = j
+            third[i] = j
         else:
-            fourth[datetime.combine(date(2000, 1, 1), i)] = j
+            fourth[i] = j
     return first, second, third, fourth
-'''
+
+def calculateChatTrafficPercentageInPartOfDay(chat: Chat):
+    _first, _second, _third, _fourth = [len(i) for i in splitMinuteBasedTrafficIntoFourParts(
+            extractMinuteBasedTraffic(chat, _fillUpEmptyMinutes = False)
+    )]
+    _total = _first + _second + _third + _fourth
+    return {
+        '00:00 - 05:59': _first * 100 / _total,
+        '06:00 - 11:59': _second * 100 / _total,
+        '12:00 - 17:59': _third * 100 / _total,
+        '18:00 - 23:59': _fourth * 100 / _total
+    }
 
 '''
 def plotAccumulatedTrafficByMinuteFor24HourSpan(data: Counter, title: str, targetPath: str) -> bool:
