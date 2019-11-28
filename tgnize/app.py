@@ -81,7 +81,7 @@ def __calculateSuccess__(data: List[bool]) -> float:
     return 0.0 if not data else reduce(lambda acc, cur: (acc + 1) if cur else acc, data, 0) / len(data) * 100
 
 def _choiceHandler(ch: int, chat: Chat):
-    if ch == -1 or ch == 6:
+    if ch == -1 or ch == 9:
         print('\n[!]Terminated')
         exit(0)
     elif ch == 0:
@@ -100,12 +100,19 @@ def _choiceHandler(ch: int, chat: Chat):
             print('{}'.format(''.join(['\n{} - \x1b[1;3;34;50m{}\x1b[0m ( {:.4f} % )'.format(i + 1, k, v) for i, (k, v) in enumerate(getTopXParticipantsAlongWithContribution(int(input()), chat).items())])))
         except Exception:
             print('\n[!]Bad Input')
+    elif ch == 6:
+        _from, _to = chat.getChatTimeRange()
+        print('\nFrom \x1b[3;31;50m{}\x1b[0m to \x1b[3;31;50m{}\x1b[0m\nSpans over : \x1b[3;33;50m{}\x1b[0m'.format(_from, _to, _to - _from))
+    elif ch == 7:
+        print('\nFound \x1b[1;31;49m{}\x1b[0m participants who sent message via Bot'.format(chat.getUserCountWhoUsedBot()))
+    elif ch == 8:
+        print('\nFound \x1b[1;31;49m{}\x1b[0m participants who didn\'t send message via Bot'.format(chat.getUserCountWhoDidNotUseBot()))
     else:
         print('\n\x1b[1;6;36;49m\_(^-^)_/\x1b[0m')
 
 def _menu() -> int:
     try:
-        print("\n[+]Options ::\n\n\t1 > Get Chat Participant Count\n\t2 > Get Message Count in Chat\n\t3 > Get Event Count in Chat\n\t4 > Get Total Activity Count in Chat\n\t5 > Get Top `X` Chat Participant(s)\n\t6 > Exit\n\n\x1b[1;1;32;50mtgnize >> \x1b[0m", end="")
+        print("\n[+]Options ::\n\n\t1 > Get Chat Participant Count\n\t2 > Get Message Count in Chat\n\t3 > Get Event Count in Chat\n\t4 > Get Total Activity Count in Chat\n\t5 > Get Top `X` Chat Participant(s)\n\t6 > Get Time Range of Chat\n\t7 > Get participant count, who sent message via Bot\n\t8 > Get participant count, who didn't send message via Bot\n\t9 > Exit\n\n\x1b[1;1;32;50mtgnize >> \x1b[0m", end="")
         return int(input())
     except EOFError:
         return -1
