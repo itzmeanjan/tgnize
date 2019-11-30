@@ -388,6 +388,22 @@ class Chat:
                 pass
         return _minDelay, _maxDelay, _tot / (len(_tmp) - 1)
 
+    def _findUserWildCard(self, low: int, high: int, name: str, found : List[str]):
+        if low > high:
+            return
+        elif low == high:
+            if self.users[low].name.startswith(name):
+                found.append(self.users[low].name)
+        else:
+            mid = low + (high - low) // 2
+            self._findUserWildCard(low, mid, name, found) if self.users[mid].name >= name \
+                else self._findUserWildCard(mid + 1, high, name, found)
+
+    def findUserWildCard(self, name: str) -> List[str]:
+        _found = []
+        self._findUserWildCard(0, self.userCount - 1, name, _found)
+        return _found
+
 
 if __name__ == '__main__':
     print('[!]This module is expected to be used as a backend handler')
