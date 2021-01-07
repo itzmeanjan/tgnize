@@ -1,14 +1,14 @@
-beautifulsoup4==4.8.1
+beautifulsoup4==4.8.1     # via -r requirements.in
 cycler==0.10.0            # via matplotlib
 kiwisolver==1.1.0         # via matplotlib
-lxml==4.4.1
-matplotlib==3.1.2
+lxml==4.6.2               # via -r requirements.in
+matplotlib==3.1.2         # via -r requirements.in
 numpy==1.17.4             # via matplotlib
 pyparsing==2.4.5          # via matplotlib
 python-dateutil==2.8.1    # via matplotlib
 six==1.13.0               # via cycler, python-dateutil
 soupsieve==1.9.5          # via beautifulsoup4
-typing==3.7.4.1
+typing==3.7.4.1           # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==42.0.0        # via kiwisolver
+# setuptools
