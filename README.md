@@ -1,3 +1,5 @@
+> **Warning** I've stopped maintaining this project !
+
 # tgnize
 
 ![accumulatedChatTrafficByMinuteOfDevsChatGroupTelegram](./plots/accumulatedChatTrafficByMinute.gif)
